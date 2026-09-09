@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบจัดการ OT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-2 sm:p-4">
+
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl p-4 sm:p-6 space-y-6">
+    
+    <div class="text-center">
+      <h1 class="text-2xl font-bold text-slate-800" id="app-title">ระบบขออนุมัติ OT</h1>
+      <p class="text-slate-500 text-sm mt-1" id="form-subtitle">เข้าสู่ระบบเพื่อใช้งาน</p>
+    </div>
+
+    <div id="alert-box" class="hidden p-3 rounded-lg text-sm text-center"></div>
+
+    <!-- 1. ฟอร์ม Login -->
+    <form id="login-form" class="space-y-4 max-w-md mx-auto">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้งาน (Username)</label>
+        <input type="text" id="login-username" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน (Password)</label>
+        <input type="password" id="login-password" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+      <button type="submit" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow-md">
+        เข้าสู่ระบบ
+      </button>
+    </form>
+
+    <!-- 2. ฟอร์ม Register -->
+    <form id="register-form" class="space-y-4 hidden max-w-md mx-auto">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">ตั้งชื่อผู้ใช้งาน (Username)</label>
+        <input type="text" id="reg-username" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">ตั้งรหัสผ่าน (Password)</label>
+        <input type="password" id="reg-password" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+      <button type="submit" id="reg-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg shadow-md">
+        ยืนยันการลงทะเบียน
+      </button>
+    </form>
+
+    <div id="auth-switch" class="text-center text-sm text-slate-600 pt-2 border-t max-w-md mx-auto">
+      <span id="toggle-text">ยังไม่มีบัญชีใช้งาน?</span>
+      <button type="button" id="toggle-btn" class="text-blue-600 font-semibold ml-1 hover:underline">
+        ลงทะเบียนใหม่
+      </button>
+    </div>
+
+    <!-- 3. ฟอร์มขอ OT สำหรับ พนักงาน (Employee App) -->
+    <div id="ot-container" class="hidden space-y-4 max-w-md mx-auto">
+      <div class="flex items-center justify-between text-xs font-semibold text-slate-500 border-b pb-3">
+        <span id="step-indicator-1" class="text-blue-600 font-bold">1. เวลาปฏิบัติงาน</span>
+        <span>&gt;</span>
+        <span id="step-indicator-2">2. แนบรูปถ่าย</span>
+        <span>&gt;</span>
+        <span id="step-indicator-3">3. ยืนยันข้อมูล</span>
+      </div>
+
+      <div id="ot-step-1" class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">เวลาเริ่ม OT</label>
+          <input type="datetime-local" id="time-in" class="w-full px-3 py-2 border rounded-lg">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">เวลาสิ้นสุด OT</label>
+          <input type="datetime-local" id="time-out" class="w-full px-3 py-2 border rounded-lg">
+        </div>
+        <div class="bg-blue-50 p-3 rounded-lg text-sm text-blue-800">
+          ชั่วโมงรวมประมาณ: <span id="calculated-hours" class="font-bold">0</span> ชั่วโมง
+        </div>
+        <button type="button" id="next-to-step-2" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold">ถัดไป: แนบรูปหลักฐาน</button>
+      </div>
+
+      <div id="ot-step-2" class="space-y-3 hidden">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">รูปถ่ายก่อนทำ OT (Before)</label>
+          <input type="file" id="img-before-input" accept="image/*" class="w-full text-sm">
+          <img id="preview-before" class="mt-2 h-32 w-full object-cover rounded-lg hidden border">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">รูปถ่ายหลังทำ OT (After)</label>
+          <input type="file" id="img-after-input" accept="image/*" class="w-full text-sm">
+          <img id="preview-after" class="mt-2 h-32 w-full object-cover rounded-lg hidden border">
+        </div>
+        <div class="flex gap-2">
+          <button type="button" id="back-to-step-1" class="w-1/2 bg-slate-200 text-slate-700 py-2 rounded-lg font-semibold">ย้อนกลับ</button>
+          <button type="button" id="next-to-step-3" class="w-1/2 bg-blue-600 text-white py-2 rounded-lg font-semibold">ถัดไป: สรุปข้อมูล</button>
+        </div>
+      </div>
+
+      <div id="ot-step-3" class="space-y-3 hidden">
+        <div class="bg-slate-50 p-3 rounded-lg space-y-1 text-sm border">
+          <p><strong>ผู้ขอ:</strong> <span id="summary-username"></span></p>
+          <p><strong>เวลาเริ่ม:</strong> <span id="summary-in"></span></p>
+          <p><strong>เวลาสิ้นสุด:</strong> <span id="summary-out"></span></p>
+          <p><strong>ชั่วโมงรวม:</strong> <span id="summary-hours"></span> ชม.</p>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" id="back-to-step-2" class="w-1/2 bg-slate-200 text-slate-700 py-2 rounded-lg font-semibold">ย้อนกลับ</button>
+          <button type="button" id="submit-ot-btn" class="w-1/2 bg-emerald-600 text-white py-2 rounded-lg font-semibold">ส่งคำขอ OT</button>
+        </div>
+      </div>
+
+      <button type="button" class="logout-btn w-full text-xs text-red-500 underline pt-2">ออกจากระบบ</button>
+    </div>
+
+    <!-- 4. แผงควบคุมสำหรับ HR / Admin Dashboard -->
+    <div id="admin-container" class="hidden space-y-6">
+      <div class="flex border-b">
+        <button id="tab-ot-btn" class="px-4 py-2 border-b-2 border-blue-600 font-bold text-blue-600 text-sm">รายการคำขอ OT</button>
+        <button id="tab-users-btn" class="px-4 py-2 text-slate-500 font-bold text-sm">จัดการพนักงาน</button>
+      </div>
+
+      <div id="tab-ot-content" class="space-y-4">
+        <h2 class="text-lg font-bold text-slate-800">รายการขออนุมัติ OT ทั้งหมด</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left text-slate-600 border">
+            <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b">
+              <tr>
+                <th class="p-2">รหัส</th>
+                <th class="p-2">พนักงาน</th>
+                <th class="p-2">เวลาเข้า-ออก</th>
+                <th class="p-2">ชม.รวม</th>
+                <th class="p-2">สถานะ</th>
+                <th class="p-2">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="ot-table-body">
+              <tr><td colspan="6" class="text-center p-4">กำลังโหลดข้อมูล...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-users-content" class="space-y-4 hidden">
+        <h2 class="text-lg font-bold text-slate-800">อนุมัติและจัดการข้อมูลพนักงาน</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left text-slate-600 border">
+            <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b">
+              <tr>
+                <th class="p-2">รหัส</th>
+                <th class="p-2">Username</th>
+                <th class="p-2">ประเภท</th>
+                <th class="p-2">สิทธิ์</th>
+                <th class="p-2">สถานะ</th>
+                <th class="p-2">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <tr><td colspan="6" class="text-center p-4">กำลังโหลดข้อมูล...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <button type="button" class="logout-btn w-full text-xs text-red-500 underline pt-4">ออกจากระบบ</button>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxRE5TfdlrgreKAx-dqTMSBwCT10TjmVRLmHINCDd13gEWBBNYNkAsOo1ztNMp69oAC/exec";
+
+    let currentUser = null;
+    let base64Before = "";
+    let base64After = "";
+
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const authSwitch = document.getElementById('auth-switch');
+    const otContainer = document.getElementById('ot-container');
+    const adminContainer = document.getElementById('admin-container');
+    const toggleBtn = document.getElementById('toggle-btn');
+    const alertBox = document.getElementById('alert-box');
+
+    window.onload = () => {
+      const savedUser = localStorage.getItem('ot_user');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        routeUser();
+      }
+    };
+
+    function routeUser() {
+      if (currentUser.role === 'Admin') {
+        showAdminApp();
+      } else {
+        showOtApp();
+      }
+    }
+
+    let isRegisterMode = false;
+    toggleBtn.addEventListener('click', () => {
+      isRegisterMode = !isRegisterMode;
+      hideAlert();
+      if (isRegisterMode) {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        toggleBtn.textContent = 'เข้าสู่ระบบ';
+      } else {
+        registerForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        toggleBtn.textContent = 'ลงทะเบียนใหม่';
+      }
+    });
+
+    function showAlert(message, isError = false) {
+      alertBox.textContent = message;
+      alertBox.className = `p-3 rounded-lg text-sm text-center ${
+        isError ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+      }`;
+      alertBox.classList.remove('hidden');
+    }
+
+    function hideAlert() { alertBox.classList.add('hidden'); }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert();
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'login',
+            username: document.getElementById('login-username').value.trim(),
+            password: document.getElementById('login-password').value.trim()
+          })
+        });
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          currentUser = result.data;
+          localStorage.setItem('ot_user', JSON.stringify(currentUser));
+          routeUser();
+        } else {
+          showAlert(result.message, true);
+        }
+      } catch (err) {
+        showAlert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', true);
+      }
+    });
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert();
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'register',
+            username: document.getElementById('reg-username').value.trim(),
+            password: document.getElementById('reg-password').value.trim()
+          })
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+          showAlert(result.message, false);
+          registerForm.reset();
+        } else {
+          showAlert(result.message, true);
+        }
+      } catch (err) { showAlert('เกิดข้อผิดพลาดในการลงทะเบียน', true); }
+    });
+
+    function showOtApp() {
+      loginForm.classList.add('hidden');
+      registerForm.classList.add('hidden');
+      authSwitch.classList.add('hidden');
+      otContainer.classList.remove('hidden');
+      document.getElementById('app-title').textContent = 'ยื่นคำขอ OT';
+      hideAlert();
+    }
+
+    function showAdminApp() {
+      loginForm.classList.add('hidden');
+      registerForm.classList.add('hidden');
+      authSwitch.classList.add('hidden');
+      adminContainer.classList.remove('hidden');
+      document.getElementById('app-title').textContent = 'ระบบผู้ดูแล (HR / Admin Dashboard)';
+      hideAlert();
+      loadAdminData();
+    }
+
+    document.querySelectorAll('.logout-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        localStorage.removeItem('ot_user');
+        location.reload();
+      });
+    });
+
+    // Admin Logic
+    const tabOtBtn = document.getElementById('tab-ot-btn');
+    const tabUsersBtn = document.getElementById('tab-users-btn');
+    const tabOtContent = document.getElementById('tab-ot-content');
+    const tabUsersContent = document.getElementById('tab-users-content');
+
+    tabOtBtn.addEventListener('click', () => {
+      tabOtContent.classList.remove('hidden');
+      tabUsersContent.classList.add('hidden');
+      tabOtBtn.className = "px-4 py-2 border-b-2 border-blue-600 font-bold text-blue-600 text-sm";
+      tabUsersBtn.className = "px-4 py-2 text-slate-500 font-bold text-sm";
+    });
+
+    tabUsersBtn.addEventListener('click', () => {
+      tabUsersContent.classList.remove('hidden');
+      tabOtContent.classList.add('hidden');
+      tabUsersBtn.className = "px-4 py-2 border-b-2 border-blue-600 font-bold text-blue-600 text-sm";
+      tabOtBtn.className = "px-4 py-2 text-slate-500 font-bold text-sm";
+    });
+
+    async function loadAdminData() {
+      const uRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_users' }) });
+      const uData = await uRes.json();
+      if (uData.status === 'success') renderUsersTable(uData.data);
+
+      const otRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_ot_requests' }) });
+      const otData = await otRes.json();
+      if (otData.status === 'success') renderOtTable(otData.data);
+    }
+
+    function renderUsersTable(users) {
+      const tbody = document.getElementById('users-table-body');
+      tbody.innerHTML = '';
+      users.forEach(u => {
+        tbody.innerHTML += `
+          <tr class="border-b">
+            <td class="p-2 font-bold">${u.userId}</td>
+            <td class="p-2">${u.username}</td>
+            <td class="p-2">
+              <select onchange="updateUser('${u.userId}', null, this.value, null)" class="border rounded p-1 text-xs">
+                <option value="รายเดือน" ${u.empType === 'รายเดือน' ? 'selected' : ''}>รายเดือน</option>
+                <option value="รายวัน" ${u.empType === 'รายวัน' ? 'selected' : ''}>รายวัน</option>
+                <option value="รอระบุ" ${u.empType === 'รอระบุ' ? 'selected' : ''}>รอระบุ</option>
+              </select>
+            </td>
+            <td class="p-2">${u.role}</td>
+            <td class="p-2">
+              <span class="px-2 py-1 rounded-full text-xs font-bold ${u.status === 'ใช้งานได้' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}">${u.status}</span>
+            </td>
+            <td class="p-2">
+              ${u.status === 'รออนุมัติ' ? 
+                `<button onclick="updateUser('${u.userId}', 'ใช้งานได้', null, null)" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs">อนุมัติ</button>` : 
+                `<button onclick="updateUser('${u.userId}', 'ระงับ', null, null)" class="bg-red-500 text-white px-2 py-1 rounded text-xs">ระงับ</button>`
+              }
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function updateUser(userId, status, empType, role) {
+      await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'update_user_status', userId, status, empType, role })
+      });
+      loadAdminData();
+    }
+
+    function renderOtTable(requests) {
+      const tbody = document.getElementById('ot-table-body');
+      tbody.innerHTML = '';
+      requests.forEach(r => {
+        tbody.innerHTML += `
+          <tr class="border-b">
+            <td class="p-2 font-bold">${r.requestId}</td>
+            <td class="p-2">${r.userId}</td>
+            <td class="p-2 text-xs">${r.timeIn}<br>ถึง ${r.timeOut}</td>
+            <td class="p-2">${r.totalHours}</td>
+            <td class="p-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${r.status === 'อนุมัติ' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}">${r.status}</span></td>
+            <td class="p-2 space-x-1">
+              <button onclick="updateOt('${r.requestId}', 'อนุมัติ')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs">อนุมัติ</button>
+              <button onclick="updateOt('${r.requestId}', 'ปฏิเสธ')" class="bg-red-500 text-white px-2 py-1 rounded text-xs">ปฏิเสธ</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function updateOt(requestId, status) {
+      await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'update_ot_status', requestId, status })
+      });
+      loadAdminData();
+    }
+
+    // OT Form Logic
+    const step1 = document.getElementById('ot-step-1');
+    const step2 = document.getElementById('ot-step-2');
+    const step3 = document.getElementById('ot-step-3');
+    const timeIn = document.getElementById('time-in');
+    const timeOut = document.getElementById('time-out');
+    const calcHours = document.getElementById('calculated-hours');
+
+    function calculateOtHours() {
+      if (timeIn.value && timeOut.value) {
+        const diffMs = new Date(timeOut.value) - new Date(timeIn.value);
+        if (diffMs > 0) {
+          const hours = (diffMs / (1000 * 60 * 60)).toFixed(2);
+          calcHours.textContent = hours;
+          return hours;
+        }
+      }
+      calcHours.textContent = "0";
+      return 0;
+    }
+
+    timeIn.addEventListener('change', calculateOtHours);
+    timeOut.addEventListener('change', calculateOtHours);
+
+    document.getElementById('next-to-step-2').addEventListener('click', () => {
+      if (calculateOtHours() <= 0) return showAlert('กรุณาเลือกเวลาให้ถูกต้อง', true);
+      hideAlert();
+      step1.classList.add('hidden');
+      step2.classList.remove('hidden');
+    });
+
+    document.getElementById('back-to-step-1').addEventListener('click', () => {
+      step2.classList.add('hidden');
+      step1.classList.remove('hidden');
+    });
+
+    document.getElementById('next-to-step-3').addEventListener('click', () => {
+      document.getElementById('summary-username').textContent = currentUser.username;
+      document.getElementById('summary-in').textContent = timeIn.value.replace('T', ' ');
+      document.getElementById('summary-out').textContent = timeOut.value.replace('T', ' ');
+      document.getElementById('summary-hours').textContent = calcHours.textContent;
+      step2.classList.add('hidden');
+      step3.classList.remove('hidden');
+    });
+
+    document.getElementById('back-to-step-2').addEventListener('click', () => {
+      step3.classList.add('hidden');
+      step2.classList.remove('hidden');
+    });
+
+    function processImage(inputEl, previewEl, callback) {
+      inputEl.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let scale = 800 / img.width;
+            if (scale > 1) scale = 1;
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const base64Str = canvas.toDataURL('image/jpeg', 0.7);
+            previewEl.src = base64Str;
+            previewEl.classList.remove('hidden');
+            callback(base64Str);
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    processImage(document.getElementById('img-before-input'), document.getElementById('preview-before'), (b) => { base64Before = b; });
+    processImage(document.getElementById('img-after-input'), document.getElementById('preview-after'), (b) => { base64After = b; });
+
+    document.getElementById('submit-ot-btn').addEventListener('click', async () => {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'request_ot',
+          userId: currentUser.userId,
+          timeIn: timeIn.value.replace('T', ' '),
+          timeOut: timeOut.value.replace('T', ' '),
+          totalHours: calcHours.textContent,
+          imageBefore: base64Before,
+          imageAfter: base64After
+        })
+      });
+      const result = await response.json();
+      if (result.status === 'success') {
+        showAlert('ยื่นคำขอ OT สำเร็จแล้ว!', false);
+        setTimeout(() => location.reload(), 1500);
+      }
+    });
+  </script>
+</body>
+</html>
