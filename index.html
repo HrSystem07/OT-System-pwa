@@ -38,8 +38,21 @@
       </button>
     </form>
 
-    <!-- 2. ฟอร์ม Register -->
+    <!-- 2. ฟอร์ม Register (ปรับเพิ่ม ชื่อ-นามสกุล และ สาขา) -->
     <form id="register-form" class="space-y-4 hidden max-w-md mx-auto">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล</label>
+        <input type="text" id="reg-fullname" placeholder="นายสมชาย ใจดี" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">สังกัดสาขา</label>
+        <select id="reg-branch" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+          <option value="สำนักงานใหญ่">สำนักงานใหญ่</option>
+          <option value="สาขาขอนแก่น">สาขาขอนแก่น</option>
+          <option value="สาขาเชียงใหม่">สาขาเชียงใหม่</option>
+          <option value="โรงงานอนาลิสต์">โรงงานอนาลิสต์</option>
+        </select>
+      </div>
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">ตั้งชื่อผู้ใช้งาน (Username)</label>
         <input type="text" id="reg-username" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -62,6 +75,16 @@
 
     <!-- 3. ฟอร์มขอ OT สำหรับ พนักงาน (Employee App) -->
     <div id="ot-container" class="hidden space-y-4 max-w-md mx-auto">
+      
+      <!-- เมนูตั้งค่า Telegram ID สำหรับพนักงาน -->
+      <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs space-y-2">
+        <p class="font-bold text-blue-800">ไอดี Telegram สำหรับรับการแจ้งเตือน:</p>
+        <div class="flex gap-2">
+          <input type="text" id="user-telegram-id" placeholder="กรอก Telegram ID เช่น 12345678" class="px-2 py-1 border rounded w-full text-slate-700">
+          <button type="button" id="save-telegram-btn" class="bg-blue-600 text-white px-3 py-1 rounded font-semibold whitespace-nowrap">บันทึก</button>
+        </div>
+      </div>
+
       <div class="flex items-center justify-between text-xs font-semibold text-slate-500 border-b pb-3">
         <span id="step-indicator-1" class="text-blue-600 font-bold">1. เวลาปฏิบัติงาน</span>
         <span>&gt;</span>
@@ -146,22 +169,22 @@
         </div>
       </div>
 
+      <!-- ตารางจัดการพนักงาน (เพิ่มการแก้ไขตำแหน่ง) -->
       <div id="tab-users-content" class="space-y-4 hidden">
         <h2 class="text-lg font-bold text-slate-800">อนุมัติและจัดการข้อมูลพนักงาน</h2>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm text-left text-slate-600 border">
+          <table class="w-full text-xs text-left text-slate-600 border">
             <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b">
               <tr>
-                <th class="p-2">รหัส</th>
-                <th class="p-2">Username</th>
+                <th class="p-2">ชื่อ-สกุล/สาขา</th>
+                <th class="p-2">ตำแหน่ง</th>
                 <th class="p-2">ประเภท</th>
-                <th class="p-2">สิทธิ์</th>
                 <th class="p-2">สถานะ</th>
                 <th class="p-2">จัดการ</th>
               </tr>
             </thead>
             <tbody id="users-table-body">
-              <tr><td colspan="6" class="text-center p-4">กำลังโหลดข้อมูล...</td></tr>
+              <tr><td colspan="5" class="text-center p-4">กำลังโหลดข้อมูล...</td></tr>
             </tbody>
           </table>
         </div>
@@ -269,7 +292,9 @@
           body: JSON.stringify({
             action: 'register',
             username: document.getElementById('reg-username').value.trim(),
-            password: document.getElementById('reg-password').value.trim()
+            password: document.getElementById('reg-password').value.trim(),
+            fullname: document.getElementById('reg-fullname').value.trim(),
+            branch: document.getElementById('reg-branch').value
           })
         });
         const result = await response.json();
@@ -288,8 +313,39 @@
       authSwitch.classList.add('hidden');
       otContainer.classList.remove('hidden');
       document.getElementById('app-title').textContent = 'ยื่นคำขอ OT';
+      document.getElementById('form-subtitle').textContent = `ยินดีต้อนรับคุณ ${currentUser.fullname || currentUser.username}`;
+      if (currentUser.telegramId) {
+        document.getElementById('user-telegram-id').value = currentUser.telegramId;
+      }
       hideAlert();
     }
+
+    // บันทึก Telegram ID
+    document.getElementById('save-telegram-btn').addEventListener('click', async () => {
+      const telegramId = document.getElementById('user-telegram-id').value.trim();
+      if (!telegramId) return showAlert('กรุณากรอก Telegram ID', true);
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'update_telegram',
+            userId: currentUser.userId,
+            telegramId: telegramId
+          })
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+          currentUser.telegramId = telegramId;
+          localStorage.setItem('ot_user', JSON.stringify(currentUser));
+          showAlert('บันทึก Telegram ID เรียบร้อยแล้ว!', false);
+        } else {
+          showAlert(result.message, true);
+        }
+      } catch (err) {
+        showAlert('เกิดข้อผิดพลาดในการบันทึก', true);
+      }
+    });
 
     function showAdminApp() {
       loginForm.classList.add('hidden');
@@ -343,23 +399,27 @@
       users.forEach(u => {
         tbody.innerHTML += `
           <tr class="border-b">
-            <td class="p-2 font-bold">${u.userId}</td>
-            <td class="p-2">${u.username}</td>
             <td class="p-2">
-              <select onchange="updateUser('${u.userId}', null, this.value, null)" class="border rounded p-1 text-xs">
+              <span class="font-bold text-slate-800">${u.fullname || u.username}</span><br>
+              <span class="text-slate-400 text-[10px]">${u.branch || 'ไม่ระบุ'} (${u.userId})</span>
+            </td>
+            <td class="p-2">
+              <input type="text" value="${u.position || 'รอระบุ'}" onchange="updateUser('${u.userId}', null, null, null, this.value)" class="border rounded p-1 text-xs w-24">
+            </td>
+            <td class="p-2">
+              <select onchange="updateUser('${u.userId}', null, this.value, null, null)" class="border rounded p-1 text-xs">
                 <option value="รายเดือน" ${u.empType === 'รายเดือน' ? 'selected' : ''}>รายเดือน</option>
                 <option value="รายวัน" ${u.empType === 'รายวัน' ? 'selected' : ''}>รายวัน</option>
                 <option value="รอระบุ" ${u.empType === 'รอระบุ' ? 'selected' : ''}>รอระบุ</option>
               </select>
             </td>
-            <td class="p-2">${u.role}</td>
             <td class="p-2">
-              <span class="px-2 py-1 rounded-full text-xs font-bold ${u.status === 'ใช้งานได้' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}">${u.status}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${u.status === 'ใช้งานได้' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}">${u.status}</span>
             </td>
             <td class="p-2">
               ${u.status === 'รออนุมัติ' ? 
-                `<button onclick="updateUser('${u.userId}', 'ใช้งานได้', null, null)" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs">อนุมัติ</button>` : 
-                `<button onclick="updateUser('${u.userId}', 'ระงับ', null, null)" class="bg-red-500 text-white px-2 py-1 rounded text-xs">ระงับ</button>`
+                `<button onclick="updateUser('${u.userId}', 'ใช้งานได้', null, null, null)" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs">อนุมัติ</button>` : 
+                `<button onclick="updateUser('${u.userId}', 'ระงับ', null, null, null)" class="bg-red-500 text-white px-2 py-1 rounded text-xs">ระงับ</button>`
               }
             </td>
           </tr>
@@ -367,10 +427,10 @@
       });
     }
 
-    async function updateUser(userId, status, empType, role) {
+    async function updateUser(userId, status, empType, role, position) {
       await fetch(API_URL, {
         method: 'POST',
-        body: JSON.stringify({ action: 'update_user_status', userId, status, empType, role })
+        body: JSON.stringify({ action: 'update_user_status', userId, status, empType, role, position })
       });
       loadAdminData();
     }
@@ -439,7 +499,7 @@
     });
 
     document.getElementById('next-to-step-3').addEventListener('click', () => {
-      document.getElementById('summary-username').textContent = currentUser.username;
+      document.getElementById('summary-username').textContent = currentUser.fullname || currentUser.username;
       document.getElementById('summary-in').textContent = timeIn.value.replace('T', ' ');
       document.getElementById('summary-out').textContent = timeOut.value.replace('T', ' ');
       document.getElementById('summary-hours').textContent = calcHours.textContent;
