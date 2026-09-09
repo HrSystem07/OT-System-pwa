@@ -38,7 +38,7 @@
       </button>
     </form>
 
-    <!-- 2. ฟอร์ม Register (ปรับเพิ่ม ชื่อ-นามสกุล และ สาขา) -->
+    <!-- 2. ฟอร์ม Register (มีชื่อ-สกุล และ สาขา) -->
     <form id="register-form" class="space-y-4 hidden max-w-md mx-auto">
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล</label>
@@ -75,8 +75,6 @@
 
     <!-- 3. ฟอร์มขอ OT สำหรับ พนักงาน (Employee App) -->
     <div id="ot-container" class="hidden space-y-4 max-w-md mx-auto">
-      
-      <!-- เมนูตั้งค่า Telegram ID สำหรับพนักงาน -->
       <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs space-y-2">
         <p class="font-bold text-blue-800">ไอดี Telegram สำหรับรับการแจ้งเตือน:</p>
         <div class="flex gap-2">
@@ -169,7 +167,6 @@
         </div>
       </div>
 
-      <!-- ตารางจัดการพนักงาน (เพิ่มการแก้ไขตำแหน่ง) -->
       <div id="tab-users-content" class="space-y-4 hidden">
         <h2 class="text-lg font-bold text-slate-800">อนุมัติและจัดการข้อมูลพนักงาน</h2>
         <div class="overflow-x-auto">
@@ -202,7 +199,8 @@
       });
     }
 
-    const API_URL = "https://script.google.com/macros/s/AKfycbwSjoKLEOCgYTRuy0nko7WlUwil6suag_7xa6bdtCGjjTbITqWqvQAPB5tdP2fs1JsXig/exec;
+    // อัปเดต API URL ใหม่เรียบร้อยแล้ว
+    const API_URL = "https://script.google.com/macros/s/AKfycbwSjoKLEOCgYTRuy0nko7WlUwil6suag_7xa6bdtCGjjTbITqWqvQAPB5tdP2fs1JsXig/exec";
 
     let currentUser = null;
     let base64Before = "";
@@ -320,7 +318,6 @@
       hideAlert();
     }
 
-    // บันทึก Telegram ID
     document.getElementById('save-telegram-btn').addEventListener('click', async () => {
       const telegramId = document.getElementById('user-telegram-id').value.trim();
       if (!telegramId) return showAlert('กรุณากรอก Telegram ID', true);
