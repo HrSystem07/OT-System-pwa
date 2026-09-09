@@ -15,7 +15,7 @@
 </head>
 <body class="bg-slate-100 min-h-screen font-sans antialiased text-slate-800">
 
-  <!-- Top Navbar (เฉพาะหน้าจอแอปพลิเคชัน) -->
+  <!-- Top Navbar -->
   <header id="main-header" class="bg-slate-900 text-white shadow-lg hidden">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -37,7 +37,7 @@
     <!-- Message Alert Box -->
     <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-sm text-center font-medium shadow-sm transition"></div>
 
-    <!-- ==================== 1. ฟอร์ม เข้าสู่ระบบ (Login) ==================== -->
+    <!-- 1. ฟอร์ม เข้าสู่ระบบ (Login) -->
     <div id="login-section" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6">
       <div class="text-center space-y-2">
         <div class="inline-flex bg-blue-100 text-blue-600 p-3 rounded-2xl mb-2">
@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <!-- ==================== 2. ฟอร์ม ลงทะเบียน (Register) ==================== -->
+    <!-- 2. ฟอร์ม ลงทะเบียน (Register) -->
     <div id="register-section" class="max-w-md mx-auto my-8 bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6 hidden">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-bold text-slate-800">ลงทะเบียนพนักงานใหม่</h2>
@@ -107,7 +107,7 @@
       </div>
     </div>
 
-    <!-- ==================== 3. หน้าขอ OT สำหรับ พนักงาน ==================== -->
+    <!-- 3. หน้าขอ OT สำหรับ พนักงาน -->
     <div id="ot-container" class="max-w-xl mx-auto space-y-6 hidden">
       <div class="bg-white rounded-2xl shadow-md border p-6 space-y-4">
         
@@ -182,7 +182,7 @@
       </div>
     </div>
 
-    <!-- ==================== 4. แผงควบคุม HR / Admin Dashboard ==================== -->
+    <!-- 4. แผงควบคุม HR / Admin Dashboard -->
     <div id="admin-container" class="space-y-6 hidden">
       
       <!-- KPI Summary Cards -->
@@ -309,6 +309,7 @@
       window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
     }
 
+    // ใส่ URL ของ Google Apps Script Web App ของคุณที่นี่
     const API_URL = "https://script.google.com/macros/s/AKfycbwSjoKLEOCgYTRuy0nko7WlUwil6suag_7xa6bdtCGjjTbITqWqvQAPB5tdP2fs1JsXig/exec";
 
     let currentUser = null;
@@ -350,7 +351,6 @@
       }
     }
 
-    // Navigation Switch
     document.getElementById('go-to-reg-btn').addEventListener('click', () => {
       loginSection.classList.add('hidden');
       registerSection.classList.remove('hidden');
@@ -373,7 +373,6 @@
 
     function hideAlert() { alertBox.classList.add('hidden'); }
 
-    // Login Action
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       hideAlert();
@@ -407,7 +406,6 @@
       }
     });
 
-    // Register Action
     document.getElementById('register-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       hideAlert();
@@ -441,7 +439,6 @@
       }
     });
 
-    // Logout
     document.querySelectorAll('.logout-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         localStorage.removeItem('ot_user');
@@ -449,7 +446,6 @@
       });
     });
 
-    // Save Telegram ID
     document.getElementById('save-telegram-btn').addEventListener('click', async () => {
       const telegramId = document.getElementById('user-telegram-id').value.trim();
       if (!telegramId) return showAlert('กรุณากรอก Telegram ID', true);
@@ -470,7 +466,6 @@
       } catch (err) { showAlert('เกิดข้อผิดพลาดในการบันทึก', true); }
     });
 
-    // Admin Dashboard Logic
     const tabOtBtn = document.getElementById('tab-ot-btn');
     const tabUsersBtn = document.getElementById('tab-users-btn');
     const tabOtContent = document.getElementById('tab-ot-content');
@@ -491,7 +486,6 @@
     });
 
     async function loadAdminData() {
-      // ดึงพนักงาน
       const uRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_users' }) });
       const uData = await uRes.json();
       if (uData.status === 'success') {
@@ -499,7 +493,6 @@
         document.getElementById('card-total-users').textContent = uData.data.length;
       }
 
-      // ดึงคำขอ OT
       const otRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_ot_requests' }) });
       const otData = await otRes.json();
       if (otData.status === 'success') {
@@ -607,7 +600,6 @@
       loadAdminData();
     }
 
-    // OT Steps Logic
     const step1 = document.getElementById('ot-step-1');
     const step2 = document.getElementById('ot-step-2');
     const step3 = document.getElementById('ot-step-3');
