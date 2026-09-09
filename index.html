@@ -3,211 +3,302 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบจัดการ OT</title>
+  <title>ระบบจัดการ OT - Corporate Management System</title>
   
   <!-- PWA Settings -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#1e293b">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5988/5988246.png">
 
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-2 sm:p-4">
+<body class="bg-slate-100 min-h-screen font-sans antialiased text-slate-800">
 
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl p-4 sm:p-6 space-y-6">
-    
-    <div class="text-center">
-      <h1 class="text-2xl font-bold text-slate-800" id="app-title">ระบบขออนุมัติ OT</h1>
-      <p class="text-slate-500 text-sm mt-1" id="form-subtitle">เข้าสู่ระบบเพื่อใช้งาน</p>
-    </div>
-
-    <div id="alert-box" class="hidden p-3 rounded-lg text-sm text-center"></div>
-
-    <!-- 1. ฟอร์ม Login -->
-    <form id="login-form" class="space-y-4 max-w-md mx-auto">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อผู้ใช้งาน (Username)</label>
-        <input type="text" id="login-username" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+  <!-- Top Navbar (เฉพาะหน้าจอแอปพลิเคชัน) -->
+  <header id="main-header" class="bg-slate-900 text-white shadow-lg hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-600 p-2 rounded-lg text-white font-bold text-lg">OT</div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg leading-none">ระบบจัดการ OT องค์กร</h1>
+          <p class="text-xs text-slate-400 mt-1" id="nav-user-info">ยินดีต้อนรับ</p>
+        </div>
       </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">รหัสผ่าน (Password)</label>
-        <input type="password" id="login-password" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-      </div>
-      <button type="submit" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg shadow-md transition">
-        เข้าสู่ระบบ
-      </button>
-    </form>
-
-    <!-- 2. ฟอร์ม Register -->
-    <form id="register-form" class="space-y-4 hidden max-w-md mx-auto">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล</label>
-        <input type="text" id="reg-fullname" placeholder="นายสมชาย ใจดี" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">สังกัดสาขา</label>
-        <select id="reg-branch" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-          <option value="สำนักงานใหญ่">สำนักงานใหญ่</option>
-          <option value="สาขาขอนแก่น">สาขาขอนแก่น</option>
-          <option value="สาขาเชียงใหม่">สาขาเชียงใหม่</option>
-          <option value="โรงงานอนาลิสต์">โรงงานอนาลิสต์</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">ตั้งชื่อผู้ใช้งาน (Username)</label>
-        <input type="text" id="reg-username" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">ตั้งรหัสผ่าน (Password)</label>
-        <input type="password" id="reg-password" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-      </div>
-      <button type="submit" id="reg-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg shadow-md transition">
-        ยืนยันการลงทะเบียน
-      </button>
-    </form>
-
-    <div id="auth-switch" class="text-center text-sm text-slate-600 pt-2 border-t max-w-md mx-auto">
-      <span id="toggle-text">ยังไม่มีบัญชีใช้งาน?</span>
-      <button type="button" id="toggle-btn" class="text-blue-600 font-semibold ml-1 hover:underline">
-        ลงทะเบียนใหม่
+      <button type="button" class="logout-btn bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/30 px-3 py-1.5 rounded-lg text-xs font-medium transition">
+        ออกจากระบบ
       </button>
     </div>
+  </header>
 
-    <!-- 3. ฟอร์มขอ OT สำหรับ พนักงาน -->
-    <div id="ot-container" class="hidden space-y-4 max-w-md mx-auto">
-      <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs space-y-2">
-        <p class="font-bold text-blue-800">ไอดี Telegram สำหรับรับการแจ้งเตือน:</p>
-        <div class="flex gap-2">
-          <input type="text" id="user-telegram-id" placeholder="กรอก Telegram ID เช่น 12345678" class="px-2 py-1 border rounded w-full text-slate-700">
-          <button type="button" id="save-telegram-btn" class="bg-blue-600 text-white px-3 py-1 rounded font-semibold whitespace-nowrap">บันทึก</button>
+  <!-- Container หลัก -->
+  <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- Message Alert Box -->
+    <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-sm text-center font-medium shadow-sm transition"></div>
+
+    <!-- ==================== 1. ฟอร์ม เข้าสู่ระบบ (Login) ==================== -->
+    <div id="login-section" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="inline-flex bg-blue-100 text-blue-600 p-3 rounded-2xl mb-2">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
+        <h2 class="text-2xl font-bold text-slate-800">เข้าสู่ระบบ OT System</h2>
+        <p class="text-sm text-slate-500">กรุณากรอกข้อมูลเพื่อเข้าใช้งานระบบ</p>
       </div>
 
-      <div class="flex items-center justify-between text-xs font-semibold text-slate-500 border-b pb-3">
-        <span id="step-indicator-1" class="text-blue-600 font-bold">1. เวลาปฏิบัติงาน</span>
-        <span>&gt;</span>
-        <span id="step-indicator-2">2. แนบรูปถ่าย</span>
-        <span>&gt;</span>
-        <span id="step-indicator-3">3. ยืนยันข้อมูล</span>
-      </div>
-
-      <div id="ot-step-1" class="space-y-3">
+      <form id="login-form" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">เวลาเริ่ม OT</label>
-          <input type="datetime-local" id="time-in" class="w-full px-3 py-2 border rounded-lg">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">เวลาสิ้นสุด OT</label>
-          <input type="datetime-local" id="time-out" class="w-full px-3 py-2 border rounded-lg">
-        </div>
-        <div class="bg-blue-50 p-3 rounded-lg text-sm text-blue-800">
-          ชั่วโมงรวมประมาณ: <span id="calculated-hours" class="font-bold">0</span> ชั่วโมง
-        </div>
-        <button type="button" id="next-to-step-2" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold">ถัดไป: แนบรูปหลักฐาน</button>
-      </div>
-
-      <div id="ot-step-2" class="space-y-3 hidden">
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">รูปถ่ายก่อนทำ OT (Before)</label>
-          <input type="file" id="img-before-input" accept="image/*" class="w-full text-sm">
-          <img id="preview-before" class="mt-2 h-32 w-full object-cover rounded-lg hidden border">
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">ชื่อผู้ใช้งาน (Username)</label>
+          <input type="text" id="login-username" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">รูปถ่ายหลังทำ OT (After)</label>
-          <input type="file" id="img-after-input" accept="image/*" class="w-full text-sm">
-          <img id="preview-after" class="mt-2 h-32 w-full object-cover rounded-lg hidden border">
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">รหัสผ่าน (Password)</label>
+          <input type="password" id="login-password" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
         </div>
-        <div class="flex gap-2">
-          <button type="button" id="back-to-step-1" class="w-1/2 bg-slate-200 text-slate-700 py-2 rounded-lg font-semibold">ย้อนกลับ</button>
-          <button type="button" id="next-to-step-3" class="w-1/2 bg-blue-600 text-white py-2 rounded-lg font-semibold">ถัดไป: สรุปข้อมูล</button>
-        </div>
-      </div>
+        <button type="submit" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-500/20 transition">
+          เข้าสู่ระบบ
+        </button>
+      </form>
 
-      <div id="ot-step-3" class="space-y-3 hidden">
-        <div class="bg-slate-50 p-3 rounded-lg space-y-1 text-sm border">
-          <p><strong>ผู้ขอ:</strong> <span id="summary-username"></span></p>
-          <p><strong>เวลาเริ่ม:</strong> <span id="summary-in"></span></p>
-          <p><strong>เวลาสิ้นสุด:</strong> <span id="summary-out"></span></p>
-          <p><strong>ชั่วโมงรวม:</strong> <span id="summary-hours"></span> ชม.</p>
-        </div>
-        <div class="flex gap-2">
-          <button type="button" id="back-to-step-2" class="w-1/2 bg-slate-200 text-slate-700 py-2 rounded-lg font-semibold">ย้อนกลับ</button>
-          <button type="button" id="submit-ot-btn" class="w-1/2 bg-emerald-600 text-white py-2 rounded-lg font-semibold">ส่งคำขอ OT</button>
-        </div>
+      <div class="text-center text-sm text-slate-500 pt-4 border-t border-slate-100">
+        ยังไม่มีบัญชีผู้ใช้? 
+        <button type="button" id="go-to-reg-btn" class="text-blue-600 font-semibold hover:underline">ลงทะเบียนพนักงานใหม่</button>
       </div>
-
-      <button type="button" class="logout-btn w-full text-xs text-red-500 underline pt-2">ออกจากระบบ</button>
     </div>
 
-    <!-- 4. แผงควบคุมสำหรับ HR / Admin Dashboard -->
-    <div id="admin-container" class="hidden space-y-6">
-      <div class="flex border-b">
-        <button id="tab-ot-btn" class="px-4 py-2 border-b-2 border-blue-600 font-bold text-blue-600 text-sm">รายการคำขอ OT</button>
-        <button id="tab-users-btn" class="px-4 py-2 text-slate-500 font-bold text-sm">จัดการพนักงาน</button>
+    <!-- ==================== 2. ฟอร์ม ลงทะเบียน (Register) ==================== -->
+    <div id="register-section" class="max-w-md mx-auto my-8 bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6 hidden">
+      <div class="text-center space-y-2">
+        <h2 class="text-2xl font-bold text-slate-800">ลงทะเบียนพนักงานใหม่</h2>
+        <p class="text-sm text-slate-500">กรอกข้อมูลเพื่อส่งให้ HR อนุมัติสิทธิ์การใช้งาน</p>
       </div>
 
-      <div id="tab-ot-content" class="space-y-4">
-        <h2 class="text-lg font-bold text-slate-800">รายการขออนุมัติ OT ทั้งหมด</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs sm:text-sm text-left text-slate-600 border">
-            <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b">
-              <tr>
-                <th class="p-2">รหัส</th>
-                <th class="p-2">พนักงาน</th>
-                <th class="p-2">เวลาเข้า-ออก</th>
-                <th class="p-2">ชม.รวม</th>
-                <th class="p-2">หลักฐาน</th>
-                <th class="p-2">สถานะ</th>
-                <th class="p-2">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="ot-table-body">
-              <tr><td colspan="7" class="text-center p-4">กำลังโหลดข้อมูล...</td></tr>
-            </tbody>
-          </table>
+      <form id="register-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">ชื่อ-นามสกุล</label>
+          <input type="text" id="reg-fullname" placeholder="นายสมชาย ใจดี" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>
-      </div>
-
-      <div id="tab-users-content" class="space-y-4 hidden">
-        <h2 class="text-lg font-bold text-slate-800">อนุมัติและจัดการข้อมูลพนักงาน</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left text-slate-600 border">
-            <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b">
-              <tr>
-                <th class="p-2">ชื่อ-สกุล/สาขา</th>
-                <th class="p-2">ตำแหน่ง</th>
-                <th class="p-2">ประเภท</th>
-                <th class="p-2">สถานะ</th>
-                <th class="p-2">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="users-table-body">
-              <tr><td colspan="5" class="text-center p-4">กำลังโหลดข้อมูล...</td></tr>
-            </tbody>
-          </table>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">สังกัดสาขา</label>
+          <select id="reg-branch" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option value="สำนักงานใหญ่">สำนักงานใหญ่</option>
+            <option value="สาขาขอนแก่น">สาขาขอนแก่น</option>
+            <option value="สาขาเชียงใหม่">สาขาเชียงใหม่</option>
+            <option value="โรงงานอนาลิสต์">โรงงานอนาลิสต์</option>
+          </select>
         </div>
-      </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">ชื่อผู้ใช้งาน (Username)</label>
+          <input type="text" id="reg-username" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">รหัสผ่าน (Password)</label>
+          <input type="password" id="reg-password" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+        <button type="submit" id="reg-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-emerald-500/20 transition">
+          ยืนยันการลงทะเบียน
+        </button>
+      </form>
 
-      <button type="button" class="logout-btn w-full text-xs text-red-500 underline pt-4">ออกจากระบบ</button>
+      <div class="text-center text-sm text-slate-500 pt-4 border-t border-slate-100">
+        มีบัญชีใช้งานอยู่แล้ว? 
+        <button type="button" id="go-to-login-btn" class="text-blue-600 font-semibold hover:underline">กลับหน้าเข้าสู่ระบบ</button>
+      </div>
     </div>
 
-  </div>
+    <!-- ==================== 3. หน้าขอ OT สำหรับ พนักงาน ==================== -->
+    <div id="ot-container" class="max-w-xl mx-auto space-y-6 hidden">
+      <div class="bg-white rounded-2xl shadow-md border p-6 space-y-4">
+        
+        <!-- Telegram ID Card -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+          <p class="text-xs font-bold text-slate-700 uppercase">Telegram Notification ID</p>
+          <div class="flex gap-2">
+            <input type="text" id="user-telegram-id" placeholder="กรอก Telegram ID เช่น 12345678" class="px-3 py-1.5 border rounded-lg w-full text-sm">
+            <button type="button" id="save-telegram-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition">บันทึก ID</button>
+          </div>
+        </div>
 
-  <!-- Modal สำหรับดูรูปหลักฐาน (Preview Image) -->
-  <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-xl p-4 max-w-lg w-full space-y-3">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-slate-800 text-sm">รูปภาพหลักฐานปฏิบัติงาน OT</h3>
-        <button id="close-modal-btn" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+        <!-- Step Indicators -->
+        <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b pb-4 pt-2">
+          <span id="step-indicator-1" class="text-blue-600">1. เลือกเวลา OT</span>
+          <span>&rarr;</span>
+          <span id="step-indicator-2">2. แนบรูปถ่ายหลักฐาน</span>
+          <span>&rarr;</span>
+          <span id="step-indicator-3">3. ยืนยันส่งคำขอ</span>
+        </div>
+
+        <!-- Step 1 -->
+        <div id="ot-step-1" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">เวลาเริ่มทำ OT</label>
+            <input type="datetime-local" id="time-in" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">เวลาสิ้นสุด OT</label>
+            <input type="datetime-local" id="time-out" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl text-sm text-blue-900 flex justify-between items-center">
+            <span>จำนวนชั่วโมงประมาณการ:</span>
+            <span class="text-lg font-bold"><span id="calculated-hours">0</span> ชม.</span>
+          </div>
+          <button type="button" id="next-to-step-2" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">ถัดไป: แนบรูปถ่ายหลักฐาน</button>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="ot-step-2" class="space-y-4 hidden">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">รูปถ่ายก่อนเริ่ม OT (Before)</label>
+            <input type="file" id="img-before-input" accept="image/*" class="w-full text-sm">
+            <img id="preview-before" class="mt-2 h-40 w-full object-cover rounded-xl hidden border">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">รูปถ่ายหลังทำ OT เสร็จ (After)</label>
+            <input type="file" id="img-after-input" accept="image/*" class="w-full text-sm">
+            <img id="preview-after" class="mt-2 h-40 w-full object-cover rounded-xl hidden border">
+          </div>
+          <div class="flex gap-3">
+            <button type="button" id="back-to-step-1" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-semibold">ย้อนกลับ</button>
+            <button type="button" id="next-to-step-3" class="w-1/2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">ถัดไป: สรุปข้อมูล</button>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="ot-step-3" class="space-y-4 hidden">
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 text-sm border">
+            <p class="flex justify-between"><span class="text-slate-500">ผู้ยื่นคำขอ:</span> <span id="summary-username" class="font-bold"></span></p>
+            <p class="flex justify-between"><span class="text-slate-500">เวลาเริ่ม:</span> <span id="summary-in" class="font-medium"></span></p>
+            <p class="flex justify-between"><span class="text-slate-500">เวลาสิ้นสุด:</span> <span id="summary-out" class="font-medium"></span></p>
+            <hr>
+            <p class="flex justify-between text-base"><span class="font-bold">ชั่วโมงรวม:</span> <span id="summary-hours" class="font-bold text-blue-600"></span> ชม.</p>
+          </div>
+          <div class="flex gap-3">
+            <button type="button" id="back-to-step-2" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-semibold">ย้อนกลับ</button>
+            <button type="button" id="submit-ot-btn" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-semibold transition">ยืนยันส่งคำขอ OT</button>
+          </div>
+        </div>
+
       </div>
-      <div class="grid grid-cols-2 gap-2">
+    </div>
+
+    <!-- ==================== 4. แผงควบคุม HR / Admin Dashboard ==================== -->
+    <div id="admin-container" class="space-y-6 hidden">
+      
+      <!-- KPI Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 43a8 8 0 100-16 8 8 0 000 16zM17 11a5 5 0 100-10 5 5 0 000 10zM2 20a6 6 0 0112 0v1H2v-1z"></path></svg>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500">พนักงานทั้งหมด</p>
+            <p class="text-2xl font-bold text-slate-800" id="card-total-users">0</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div class="p-3 bg-amber-100 text-amber-600 rounded-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500">คำขอ OT รอการอนุมัติ</p>
+            <p class="text-2xl font-bold text-amber-600" id="card-pending-ot">0</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
+          <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <div>
+            <p class="text-xs font-semibold text-slate-500">คำขอ OT อนุมัติแล้ว</p>
+            <p class="text-2xl font-bold text-emerald-600" id="card-approved-ot">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Dashboard Panel -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        
+        <!-- Navigation Tabs -->
+        <div class="flex border-b bg-slate-50 px-4 pt-2 gap-2">
+          <button id="tab-ot-btn" class="px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition">รายการขออนุมัติ OT</button>
+          <button id="tab-users-btn" class="px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition">จัดการสิทธิ์พนักงาน</button>
+        </div>
+
+        <!-- Content 1: ตาราง OT -->
+        <div id="tab-ot-content" class="p-6 space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-base font-bold text-slate-800">รายการคำขอ OT ทั้งหมด</h3>
+            <button onclick="loadAdminData()" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">🔄 รีเฟรชข้อมูล</button>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-xs sm:text-sm text-left text-slate-600">
+              <thead class="text-xs text-slate-500 uppercase bg-slate-100 border-b">
+                <tr>
+                  <th class="p-3">รหัส</th>
+                  <th class="p-3">พนักงาน</th>
+                  <th class="p-3">เวลาปฏิบัติงาน</th>
+                  <th class="p-3">ชม.รวม</th>
+                  <th class="p-3">หลักฐาน</th>
+                  <th class="p-3">สถานะ</th>
+                  <th class="p-3">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="ot-table-body" class="divide-y divide-slate-100">
+                <tr><td colspan="7" class="text-center p-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Content 2: ตารางจัดการพนักงาน -->
+        <div id="tab-users-content" class="p-6 space-y-4 hidden">
+          <div class="flex justify-between items-center">
+            <h3 class="text-base font-bold text-slate-800">อนุมัติและจัดการข้อมูลพนักงาน</h3>
+            <button onclick="loadAdminData()" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">🔄 รีเฟรชข้อมูล</button>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-xs sm:text-sm text-left text-slate-600">
+              <thead class="text-xs text-slate-500 uppercase bg-slate-100 border-b">
+                <tr>
+                  <th class="p-3">ชื่อ-นามสกุล / สาขา</th>
+                  <th class="p-3">ตำแหน่ง</th>
+                  <th class="p-3">ประเภท</th>
+                  <th class="p-3">สถานะ</th>
+                  <th class="p-3">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body" class="divide-y divide-slate-100">
+                <tr><td colspan="5" class="text-center p-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal ดูรูปภาพหลักฐาน -->
+  <div id="image-modal" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl p-6 max-w-xl w-full space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base">รูปภาพหลักฐานการทำ OT</h3>
+        <button id="close-modal-btn" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <p class="text-xs font-semibold text-slate-500 mb-1 text-center">รูปก่อนทำ (Before)</p>
-          <img id="modal-img-before" class="w-full h-40 object-cover rounded border bg-slate-100" alt="ไม่มีรูปภาพ">
+          <p class="text-xs font-bold text-slate-500 mb-2 text-center">รูปก่อนทำ (Before)</p>
+          <img id="modal-img-before" class="w-full h-48 object-cover rounded-xl border bg-slate-50 shadow-inner" alt="ไม่มีรูปภาพ">
         </div>
         <div>
-          <p class="text-xs font-semibold text-slate-500 mb-1 text-center">รูปหลังทำ (After)</p>
-          <img id="modal-img-after" class="w-full h-40 object-cover rounded border bg-slate-100" alt="ไม่มีรูปภาพ">
+          <p class="text-xs font-bold text-slate-500 mb-2 text-center">รูปหลังทำ (After)</p>
+          <img id="modal-img-after" class="w-full h-48 object-cover rounded-xl border bg-slate-50 shadow-inner" alt="ไม่มีรูปภาพ">
         </div>
       </div>
     </div>
@@ -215,9 +306,7 @@
 
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js');
-      });
+      window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
     }
 
     const API_URL = "https://script.google.com/macros/s/AKfycbwSjoKLEOCgYTRuy0nko7WlUwil6suag_7xa6bdtCGjjTbITqWqvQAPB5tdP2fs1JsXig/exec";
@@ -226,14 +315,11 @@
     let base64Before = "";
     let base64After = "";
 
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const authSwitch = document.getElementById('auth-switch');
+    const mainHeader = document.getElementById('main-header');
+    const loginSection = document.getElementById('login-section');
+    const registerSection = document.getElementById('register-section');
     const otContainer = document.getElementById('ot-container');
     const adminContainer = document.getElementById('admin-container');
-    const toggleBtn = document.getElementById('toggle-btn');
-    const toggleText = document.getElementById('toggle-text');
-    const formSubtitle = document.getElementById('form-subtitle');
     const alertBox = document.getElementById('alert-box');
 
     window.onload = () => {
@@ -245,50 +331,55 @@
     };
 
     function routeUser() {
+      mainHeader.classList.remove('hidden');
+      document.getElementById('nav-user-info').textContent = `ผู้ใช้งาน: ${currentUser.fullname || currentUser.username} (${currentUser.role})`;
+      
+      loginSection.classList.add('hidden');
+      registerSection.classList.add('hidden');
+
       if (currentUser.role === 'Admin') {
-        showAdminApp();
+        adminContainer.classList.remove('hidden');
+        otContainer.classList.add('hidden');
+        loadAdminData();
       } else {
-        showOtApp();
+        otContainer.classList.remove('hidden');
+        adminContainer.classList.add('hidden');
+        if (currentUser.telegramId) {
+          document.getElementById('user-telegram-id').value = currentUser.telegramId;
+        }
       }
     }
 
-    let isRegisterMode = false;
-    toggleBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      isRegisterMode = !isRegisterMode;
+    // Navigation Switch
+    document.getElementById('go-to-reg-btn').addEventListener('click', () => {
+      loginSection.classList.add('hidden');
+      registerSection.classList.remove('hidden');
       hideAlert();
-      
-      if (isRegisterMode) {
-        loginForm.classList.add('hidden');
-        registerForm.classList.remove('hidden');
-        formSubtitle.textContent = 'สร้างบัญชีผู้ใช้ใหม่สำหรับพนักงาน';
-        toggleText.textContent = 'มีบัญชีใช้งานอยู่แล้ว?';
-        toggleBtn.textContent = 'เข้าสู่ระบบ';
-      } else {
-        registerForm.classList.add('hidden');
-        loginForm.classList.remove('hidden');
-        formSubtitle.textContent = 'เข้าสู่ระบบเพื่อใช้งาน';
-        toggleText.textContent = 'ยังไม่มีบัญชีใช้งาน?';
-        toggleBtn.textContent = 'ลงทะเบียนใหม่';
-      }
+    });
+
+    document.getElementById('go-to-login-btn').addEventListener('click', () => {
+      registerSection.classList.add('hidden');
+      loginSection.classList.remove('hidden');
+      hideAlert();
     });
 
     function showAlert(message, isError = false) {
       alertBox.textContent = message;
-      alertBox.className = `p-3 rounded-lg text-sm text-center ${
-        isError ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+      alertBox.className = `p-4 rounded-xl text-sm text-center font-medium shadow-sm border ${
+        isError ? 'bg-red-50 text-red-700 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
       }`;
       alertBox.classList.remove('hidden');
     }
 
     function hideAlert() { alertBox.classList.add('hidden'); }
 
-    loginForm.addEventListener('submit', async (e) => {
+    // Login Action
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       hideAlert();
       const btn = document.getElementById('login-btn');
       btn.disabled = true;
-      btn.textContent = 'กำลังเข้าสู่ระบบ...';
+      btn.textContent = 'กำลังตรวจสอบข้อมูล...';
 
       try {
         const response = await fetch(API_URL, {
@@ -316,12 +407,13 @@
       }
     });
 
-    registerForm.addEventListener('submit', async (e) => {
+    // Register Action
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       hideAlert();
       const btn = document.getElementById('reg-btn');
       btn.disabled = true;
-      btn.textContent = 'กำลังส่งข้อมูล...';
+      btn.textContent = 'กำลังลงทะเบียน...';
 
       try {
         const response = await fetch(API_URL, {
@@ -337,7 +429,7 @@
         const result = await response.json();
         if (result.status === 'success') {
           showAlert(result.message, false);
-          registerForm.reset();
+          document.getElementById('register-form').reset();
         } else {
           showAlert(result.message, true);
         }
@@ -349,19 +441,15 @@
       }
     });
 
-    function showOtApp() {
-      loginForm.classList.add('hidden');
-      registerForm.classList.add('hidden');
-      authSwitch.classList.add('hidden');
-      otContainer.classList.remove('hidden');
-      document.getElementById('app-title').textContent = 'ยื่นคำขอ OT';
-      document.getElementById('form-subtitle').textContent = `ยินดีต้อนรับคุณ ${currentUser.fullname || currentUser.username}`;
-      if (currentUser.telegramId) {
-        document.getElementById('user-telegram-id').value = currentUser.telegramId;
-      }
-      hideAlert();
-    }
+    // Logout
+    document.querySelectorAll('.logout-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        localStorage.removeItem('ot_user');
+        location.reload();
+      });
+    });
 
+    // Save Telegram ID
     document.getElementById('save-telegram-btn').addEventListener('click', async () => {
       const telegramId = document.getElementById('user-telegram-id').value.trim();
       if (!telegramId) return showAlert('กรุณากรอก Telegram ID', true);
@@ -369,11 +457,7 @@
       try {
         const response = await fetch(API_URL, {
           method: 'POST',
-          body: JSON.stringify({
-            action: 'update_telegram',
-            userId: currentUser.userId,
-            telegramId: telegramId
-          })
+          body: JSON.stringify({ action: 'update_telegram', userId: currentUser.userId, telegramId })
         });
         const result = await response.json();
         if (result.status === 'success') {
@@ -383,28 +467,10 @@
         } else {
           showAlert(result.message, true);
         }
-      } catch (err) {
-        showAlert('เกิดข้อผิดพลาดในการบันทึก', true);
-      }
+      } catch (err) { showAlert('เกิดข้อผิดพลาดในการบันทึก', true); }
     });
 
-    function showAdminApp() {
-      loginForm.classList.add('hidden');
-      registerForm.classList.add('hidden');
-      authSwitch.classList.add('hidden');
-      adminContainer.classList.remove('hidden');
-      document.getElementById('app-title').textContent = 'ระบบผู้ดูแล (HR / Admin Dashboard)';
-      hideAlert();
-      loadAdminData();
-    }
-
-    document.querySelectorAll('.logout-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        localStorage.removeItem('ot_user');
-        location.reload();
-      });
-    });
-
+    // Admin Dashboard Logic
     const tabOtBtn = document.getElementById('tab-ot-btn');
     const tabUsersBtn = document.getElementById('tab-users-btn');
     const tabOtContent = document.getElementById('tab-ot-content');
@@ -413,25 +479,36 @@
     tabOtBtn.addEventListener('click', () => {
       tabOtContent.classList.remove('hidden');
       tabUsersContent.classList.add('hidden');
-      tabOtBtn.className = "px-4 py-2 border-b-2 border-blue-600 font-bold text-blue-600 text-sm";
-      tabUsersBtn.className = "px-4 py-2 text-slate-500 font-bold text-sm";
+      tabOtBtn.className = "px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition";
+      tabUsersBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
     });
 
     tabUsersBtn.addEventListener('click', () => {
       tabUsersContent.classList.remove('hidden');
       tabOtContent.classList.add('hidden');
-      tabUsersBtn.className = "px-4 py-2 border-b-2 border-blue-600 font-bold text-blue-600 text-sm";
-      tabOtBtn.className = "px-4 py-2 text-slate-500 font-bold text-sm";
+      tabUsersBtn.className = "px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition";
+      tabOtBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
     });
 
     async function loadAdminData() {
+      // ดึงพนักงาน
       const uRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_users' }) });
       const uData = await uRes.json();
-      if (uData.status === 'success') renderUsersTable(uData.data);
+      if (uData.status === 'success') {
+        renderUsersTable(uData.data);
+        document.getElementById('card-total-users').textContent = uData.data.length;
+      }
 
+      // ดึงคำขอ OT
       const otRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_ot_requests' }) });
       const otData = await otRes.json();
-      if (otData.status === 'success') renderOtTable(otData.data);
+      if (otData.status === 'success') {
+        renderOtTable(otData.data);
+        const pending = otData.data.filter(r => r.status === 'รออนุมัติ').length;
+        const approved = otData.data.filter(r => r.status === 'อนุมัติ').length;
+        document.getElementById('card-pending-ot').textContent = pending;
+        document.getElementById('card-approved-ot').textContent = approved;
+      }
     }
 
     function renderUsersTable(users) {
@@ -439,28 +516,28 @@
       tbody.innerHTML = '';
       users.forEach(u => {
         tbody.innerHTML += `
-          <tr class="border-b">
-            <td class="p-2">
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3">
               <span class="font-bold text-slate-800">${u.fullname || u.username}</span><br>
-              <span class="text-slate-400 text-[10px]">${u.branch || 'ไม่ระบุ'} (${u.userId})</span>
+              <span class="text-slate-400 text-xs">${u.branch || 'ไม่ระบุ'} (${u.userId})</span>
             </td>
-            <td class="p-2">
-              <input type="text" value="${u.position || 'รอระบุ'}" onchange="updateUser('${u.userId}', null, null, null, this.value)" class="border rounded p-1 text-xs w-24">
+            <td class="p-3">
+              <input type="text" value="${u.position || 'รอระบุ'}" onchange="updateUser('${u.userId}', null, null, null, this.value)" class="border rounded-lg p-1.5 text-xs w-28 bg-slate-50 focus:bg-white">
             </td>
-            <td class="p-2">
-              <select onchange="updateUser('${u.userId}', null, this.value, null, null)" class="border rounded p-1 text-xs">
+            <td class="p-3">
+              <select onchange="updateUser('${u.userId}', null, this.value, null, null)" class="border rounded-lg p-1.5 text-xs bg-slate-50">
                 <option value="รายเดือน" ${u.empType === 'รายเดือน' ? 'selected' : ''}>รายเดือน</option>
                 <option value="รายวัน" ${u.empType === 'รายวัน' ? 'selected' : ''}>รายวัน</option>
                 <option value="รอระบุ" ${u.empType === 'รอระบุ' ? 'selected' : ''}>รอระบุ</option>
               </select>
             </td>
-            <td class="p-2">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${u.status === 'ใช้งานได้' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}">${u.status}</span>
+            <td class="p-3">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${u.status === 'ใช้งานได้' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${u.status}</span>
             </td>
-            <td class="p-2">
+            <td class="p-3">
               ${u.status === 'รออนุมัติ' ? 
-                `<button onclick="updateUser('${u.userId}', 'ใช้งานได้', null, null, null)" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs">อนุมัติ</button>` : 
-                `<button onclick="updateUser('${u.userId}', 'ระงับ', null, null, null)" class="bg-red-500 text-white px-2 py-1 rounded text-xs">ระงับ</button>`
+                `<button onclick="updateUser('${u.userId}', 'ใช้งานได้', null, null, null)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm transition">อนุมัติสิทธิ์</button>` : 
+                `<button onclick="updateUser('${u.userId}', 'ระงับ', null, null, null)" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium transition">ระงับใช้งาน</button>`
               }
             </td>
           </tr>
@@ -476,7 +553,6 @@
       loadAdminData();
     }
 
-    // แสดงรายการ OT พร้อมปุ่มกดดูรูปภาพ
     window.allOtRequests = [];
     function renderOtTable(requests) {
       window.allOtRequests = requests;
@@ -484,27 +560,28 @@
       tbody.innerHTML = '';
       requests.forEach(r => {
         tbody.innerHTML += `
-          <tr class="border-b">
-            <td class="p-2 font-bold">${r.requestId}</td>
-            <td class="p-2">${r.userId}</td>
-            <td class="p-2 text-xs">${r.timeIn}<br>ถึง ${r.timeOut}</td>
-            <td class="p-2 font-semibold">${r.totalHours}</td>
-            <td class="p-2">
-              <button onclick="viewImages('${r.requestId}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border px-2 py-1 rounded text-[10px] font-semibold flex items-center gap-1">
-                📷 ดูรูป
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-bold text-slate-700">${r.requestId}</td>
+            <td class="p-3">${r.userId}</td>
+            <td class="p-3 text-xs leading-relaxed">${r.timeIn}<br><span class="text-slate-400">ถึง</span> ${r.timeOut}</td>
+            <td class="p-3 font-bold text-blue-600">${r.totalHours} ชม.</td>
+            <td class="p-3">
+              <button onclick="viewImages('${r.requestId}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition">
+                📷 ดูหลักฐาน
               </button>
             </td>
-            <td class="p-2"><span class="px-2 py-1 rounded-full text-[10px] font-bold ${r.status === 'อนุมัติ' ? 'bg-emerald-100 text-emerald-700' : r.status === 'ปฏิเสธ' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}">${r.status}</span></td>
-            <td class="p-2 space-x-1">
-              <button onclick="updateOt('${r.requestId}', 'อนุมัติ')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs">อนุมัติ</button>
-              <button onclick="updateOt('${r.requestId}', 'ปฏิเสธ')" class="bg-red-500 text-white px-2 py-1 rounded text-xs">ปฏิเสธ</button>
+            <td class="p-3">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${r.status === 'อนุมัติ' ? 'bg-emerald-100 text-emerald-700' : r.status === 'ปฏิเสธ' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">${r.status}</span>
+            </td>
+            <td class="p-3 space-x-1">
+              <button onclick="updateOt('${r.requestId}', 'อนุมัติ')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium shadow-sm transition">อนุมัติ</button>
+              <button onclick="updateOt('${r.requestId}', 'ปฏิเสธ')" class="bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1.5 rounded-lg text-xs font-medium transition">ปฏิเสธ</button>
             </td>
           </tr>
         `;
       });
     }
 
-    // ฟังก์ชันเปิดดูรูปหลักฐาน Modal
     function viewImages(requestId) {
       const ot = window.allOtRequests.find(item => item.requestId === requestId);
       if (ot) {
@@ -530,6 +607,7 @@
       loadAdminData();
     }
 
+    // OT Steps Logic
     const step1 = document.getElementById('ot-step-1');
     const step2 = document.getElementById('ot-step-2');
     const step3 = document.getElementById('ot-step-3');
@@ -554,7 +632,7 @@
     timeOut.addEventListener('change', calculateOtHours);
 
     document.getElementById('next-to-step-2').addEventListener('click', () => {
-      if (calculateOtHours() <= 0) return showAlert('กรุณาเลือกเวลาให้ถูกต้อง', true);
+      if (calculateOtHours() <= 0) return showAlert('กรุณาเลือกเวลาเริ่มและสิ้นสุดให้ถูกต้อง', true);
       hideAlert();
       step1.classList.add('hidden');
       step2.classList.remove('hidden');
@@ -623,7 +701,7 @@
       });
       const result = await response.json();
       if (result.status === 'success') {
-        showAlert('ยื่นคำขอ OT สำเร็จแล้ว!', false);
+        showAlert('ยื่นคำขอ OT สำเร็จเรียบร้อยแล้ว!', false);
         setTimeout(() => location.reload(), 1500);
       }
     });
