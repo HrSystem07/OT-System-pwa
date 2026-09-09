@@ -16,13 +16,11 @@
 
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl p-4 sm:p-6 space-y-6">
     
-    <!-- Header -->
     <div class="text-center">
       <h1 class="text-2xl font-bold text-slate-800" id="app-title">ระบบขออนุมัติ OT</h1>
       <p class="text-slate-500 text-sm mt-1" id="form-subtitle">เข้าสู่ระบบเพื่อใช้งาน</p>
     </div>
 
-    <!-- Alert Box -->
     <div id="alert-box" class="hidden p-3 rounded-lg text-sm text-center"></div>
 
     <!-- 1. ฟอร์ม Login -->
@@ -40,7 +38,7 @@
       </button>
     </form>
 
-    <!-- 2. ฟอร์ม Register (ชื่อ-สกุล, สาขา, Username, Password) -->
+    <!-- 2. ฟอร์ม Register -->
     <form id="register-form" class="space-y-4 hidden max-w-md mx-auto">
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล</label>
@@ -68,15 +66,14 @@
       </button>
     </form>
 
-    <!-- สวิตช์สลับหน้า Login/Register -->
     <div id="auth-switch" class="text-center text-sm text-slate-600 pt-2 border-t max-w-md mx-auto">
       <span id="toggle-text">ยังไม่มีบัญชีใช้งาน?</span>
-      <button type="button" id="toggle-btn" class="text-blue-600 font-semibold ml-1 hover:underline focus:outline-none">
+      <button type="button" id="toggle-btn" class="text-blue-600 font-semibold ml-1 hover:underline">
         ลงทะเบียนใหม่
       </button>
     </div>
 
-    <!-- 3. ฟอร์มขอ OT สำหรับ พนักงาน (Employee App) -->
+    <!-- 3. ฟอร์มขอ OT สำหรับ พนักงาน -->
     <div id="ot-container" class="hidden space-y-4 max-w-md mx-auto">
       <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs space-y-2">
         <p class="font-bold text-blue-800">ไอดี Telegram สำหรับรับการแจ้งเตือน:</p>
@@ -152,19 +149,20 @@
       <div id="tab-ot-content" class="space-y-4">
         <h2 class="text-lg font-bold text-slate-800">รายการขออนุมัติ OT ทั้งหมด</h2>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm text-left text-slate-600 border">
+          <table class="w-full text-xs sm:text-sm text-left text-slate-600 border">
             <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b">
               <tr>
                 <th class="p-2">รหัส</th>
                 <th class="p-2">พนักงาน</th>
                 <th class="p-2">เวลาเข้า-ออก</th>
                 <th class="p-2">ชม.รวม</th>
+                <th class="p-2">หลักฐาน</th>
                 <th class="p-2">สถานะ</th>
                 <th class="p-2">จัดการ</th>
               </tr>
             </thead>
             <tbody id="ot-table-body">
-              <tr><td colspan="6" class="text-center p-4">กำลังโหลดข้อมูล...</td></tr>
+              <tr><td colspan="7" class="text-center p-4">กำลังโหลดข้อมูล...</td></tr>
             </tbody>
           </table>
         </div>
@@ -193,6 +191,26 @@
       <button type="button" class="logout-btn w-full text-xs text-red-500 underline pt-4">ออกจากระบบ</button>
     </div>
 
+  </div>
+
+  <!-- Modal สำหรับดูรูปหลักฐาน (Preview Image) -->
+  <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-4 max-w-lg w-full space-y-3">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-slate-800 text-sm">รูปภาพหลักฐานปฏิบัติงาน OT</h3>
+        <button id="close-modal-btn" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <p class="text-xs font-semibold text-slate-500 mb-1 text-center">รูปก่อนทำ (Before)</p>
+          <img id="modal-img-before" class="w-full h-40 object-cover rounded border bg-slate-100" alt="ไม่มีรูปภาพ">
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 mb-1 text-center">รูปหลังทำ (After)</p>
+          <img id="modal-img-after" class="w-full h-40 object-cover rounded border bg-slate-100" alt="ไม่มีรูปภาพ">
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -234,7 +252,6 @@
       }
     }
 
-    // ฟังก์ชันสลับหน้า Login / Register (ปรับปรุงใหม่ทำงานได้แน่นอน)
     let isRegisterMode = false;
     toggleBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -459,7 +476,10 @@
       loadAdminData();
     }
 
+    // แสดงรายการ OT พร้อมปุ่มกดดูรูปภาพ
+    window.allOtRequests = [];
     function renderOtTable(requests) {
+      window.allOtRequests = requests;
       const tbody = document.getElementById('ot-table-body');
       tbody.innerHTML = '';
       requests.forEach(r => {
@@ -468,8 +488,13 @@
             <td class="p-2 font-bold">${r.requestId}</td>
             <td class="p-2">${r.userId}</td>
             <td class="p-2 text-xs">${r.timeIn}<br>ถึง ${r.timeOut}</td>
-            <td class="p-2">${r.totalHours}</td>
-            <td class="p-2"><span class="px-2 py-1 rounded-full text-xs font-bold ${r.status === 'อนุมัติ' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}">${r.status}</span></td>
+            <td class="p-2 font-semibold">${r.totalHours}</td>
+            <td class="p-2">
+              <button onclick="viewImages('${r.requestId}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border px-2 py-1 rounded text-[10px] font-semibold flex items-center gap-1">
+                📷 ดูรูป
+              </button>
+            </td>
+            <td class="p-2"><span class="px-2 py-1 rounded-full text-[10px] font-bold ${r.status === 'อนุมัติ' ? 'bg-emerald-100 text-emerald-700' : r.status === 'ปฏิเสธ' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}">${r.status}</span></td>
             <td class="p-2 space-x-1">
               <button onclick="updateOt('${r.requestId}', 'อนุมัติ')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs">อนุมัติ</button>
               <button onclick="updateOt('${r.requestId}', 'ปฏิเสธ')" class="bg-red-500 text-white px-2 py-1 rounded text-xs">ปฏิเสธ</button>
@@ -478,6 +503,24 @@
         `;
       });
     }
+
+    // ฟังก์ชันเปิดดูรูปหลักฐาน Modal
+    function viewImages(requestId) {
+      const ot = window.allOtRequests.find(item => item.requestId === requestId);
+      if (ot) {
+        document.getElementById('modal-img-before').src = ot.imageBefore || 'https://via.placeholder.com/300x200?text=No+Image';
+        document.getElementById('modal-img-after').src = ot.imageAfter || 'https://via.placeholder.com/300x200?text=No+Image';
+        const modal = document.getElementById('image-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    document.getElementById('close-modal-btn').addEventListener('click', () => {
+      const modal = document.getElementById('image-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    });
 
     async function updateOt(requestId, status) {
       await fetch(API_URL, {
