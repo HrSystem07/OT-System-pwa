@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบจัดการ OT - Corporate Management System</title>
   
-  <!-- PWA Settings -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e293b">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5988/5988246.png">
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans antialiased text-slate-800">
@@ -31,13 +29,11 @@
     </div>
   </header>
 
-  <!-- Container หลัก -->
   <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
 
-    <!-- Message Alert Box -->
     <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-sm text-center font-medium shadow-sm transition"></div>
 
-    <!-- 1. ฟอร์ม เข้าสู่ระบบ (Login) -->
+    <!-- 1. Login Section -->
     <div id="login-section" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6">
       <div class="text-center space-y-2">
         <div class="inline-flex bg-blue-100 text-blue-600 p-3 rounded-2xl mb-2">
@@ -67,7 +63,7 @@
       </div>
     </div>
 
-    <!-- 2. ฟอร์ม ลงทะเบียน (Register) -->
+    <!-- 2. Register Section -->
     <div id="register-section" class="max-w-md mx-auto my-8 bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6 hidden">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-bold text-slate-800">ลงทะเบียนพนักงานใหม่</h2>
@@ -107,20 +103,10 @@
       </div>
     </div>
 
-    <!-- 3. หน้าขอ OT สำหรับ พนักงาน -->
+    <!-- 3. Employee OT Request Section -->
     <div id="ot-container" class="max-w-xl mx-auto space-y-6 hidden">
       <div class="bg-white rounded-2xl shadow-md border p-6 space-y-4">
         
-        <!-- Telegram ID Card -->
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
-          <p class="text-xs font-bold text-slate-700 uppercase">Telegram Notification ID</p>
-          <div class="flex gap-2">
-            <input type="text" id="user-telegram-id" placeholder="กรอก Telegram ID เช่น 12345678" class="px-3 py-1.5 border rounded-lg w-full text-sm">
-            <button type="button" id="save-telegram-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition">บันทึก ID</button>
-          </div>
-        </div>
-
-        <!-- Step Indicators -->
         <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b pb-4 pt-2">
           <span id="step-indicator-1" class="text-blue-600">1. เลือกเวลา OT</span>
           <span>&rarr;</span>
@@ -129,7 +115,6 @@
           <span id="step-indicator-3">3. ยืนยันส่งคำขอ</span>
         </div>
 
-        <!-- Step 1 -->
         <div id="ot-step-1" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">เวลาเริ่มทำ OT</label>
@@ -146,7 +131,6 @@
           <button type="button" id="next-to-step-2" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">ถัดไป: แนบรูปถ่ายหลักฐาน</button>
         </div>
 
-        <!-- Step 2 -->
         <div id="ot-step-2" class="space-y-4 hidden">
           <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">รูปถ่ายก่อนเริ่ม OT (Before)</label>
@@ -164,7 +148,6 @@
           </div>
         </div>
 
-        <!-- Step 3 -->
         <div id="ot-step-3" class="space-y-4 hidden">
           <div class="bg-slate-50 p-4 rounded-xl space-y-2 text-sm border">
             <p class="flex justify-between"><span class="text-slate-500">ผู้ยื่นคำขอ:</span> <span id="summary-username" class="font-bold"></span></p>
@@ -182,10 +165,10 @@
       </div>
     </div>
 
-    <!-- 4. แผงควบคุม HR / Admin Dashboard -->
+    <!-- 4. Admin Dashboard Section -->
     <div id="admin-container" class="space-y-6 hidden">
       
-      <!-- KPI Summary Cards -->
+      <!-- KPI Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
           <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
@@ -218,16 +201,16 @@
         </div>
       </div>
 
-      <!-- Main Dashboard Panel -->
+      <!-- Dashboard Panel -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         
-        <!-- Navigation Tabs -->
         <div class="flex border-b bg-slate-50 px-4 pt-2 gap-2">
           <button id="tab-ot-btn" class="px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition">รายการขออนุมัติ OT</button>
           <button id="tab-users-btn" class="px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition">จัดการสิทธิ์พนักงาน</button>
+          <button id="tab-settings-btn" class="px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition">ตั้งค่าระบบ</button>
         </div>
 
-        <!-- Content 1: ตาราง OT -->
+        <!-- Tab 1: OT Table with Pagination -->
         <div id="tab-ot-content" class="p-6 space-y-4">
           <div class="flex justify-between items-center">
             <h3 class="text-base font-bold text-slate-800">รายการคำขอ OT ทั้งหมด</h3>
@@ -252,9 +235,18 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Pagination Controls -->
+          <div class="flex justify-between items-center pt-2 text-xs text-slate-500">
+            <span id="page-info">แสดงหน้า 1 จาก 1</span>
+            <div class="flex gap-2">
+              <button id="prev-page-btn" class="px-3 py-1.5 border rounded-lg hover:bg-slate-50 disabled:opacity-50">ย้อนกลับ</button>
+              <button id="next-page-btn" class="px-3 py-1.5 border rounded-lg hover:bg-slate-50 disabled:opacity-50">ถัดไป</button>
+            </div>
+          </div>
         </div>
 
-        <!-- Content 2: ตารางจัดการพนักงาน -->
+        <!-- Tab 2: Users Table -->
         <div id="tab-users-content" class="p-6 space-y-4 hidden">
           <div class="flex justify-between items-center">
             <h3 class="text-base font-bold text-slate-800">อนุมัติและจัดการข้อมูลพนักงาน</h3>
@@ -276,6 +268,22 @@
                 <tr><td colspan="5" class="text-center p-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- Tab 3: Settings Panel -->
+        <div id="tab-settings-content" class="p-6 space-y-6 hidden">
+          <h3 class="text-base font-bold text-slate-800">การตั้งค่าระบบและเงื่อนไข HR</h3>
+          
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex justify-between items-center">
+            <div>
+              <p class="font-bold text-slate-800 text-sm">อนุญาตให้พนักงานยื่นและแก้ไขเวลา OT</p>
+              <p class="text-xs text-slate-500 mt-1">หากปิดสิทธิ์ พนักงานจะไม่สามารถสร้างคำขอใหม่หรือแก้ไขเวลาได้ (สำหรับช่วงสรุปยอดเงินเดือน)</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="toggle-edit-lock" class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
           </div>
         </div>
 
@@ -309,12 +317,16 @@
       window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
     }
 
-    // ใส่ URL ของ Google Apps Script Web App ของคุณที่นี่
     const API_URL = "https://script.google.com/macros/s/AKfycbwSjoKLEOCgYTRuy0nko7WlUwil6suag_7xa6bdtCGjjTbITqWqvQAPB5tdP2fs1JsXig/exec";
 
     let currentUser = null;
     let base64Before = "";
     let base64After = "";
+
+    // Pagination Variables
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let allOtRequestsList = [];
 
     const mainHeader = document.getElementById('main-header');
     const loginSection = document.getElementById('login-section');
@@ -345,9 +357,6 @@
       } else {
         otContainer.classList.remove('hidden');
         adminContainer.classList.add('hidden');
-        if (currentUser.telegramId) {
-          document.getElementById('user-telegram-id').value = currentUser.telegramId;
-        }
       }
     }
 
@@ -446,43 +455,39 @@
       });
     });
 
-    document.getElementById('save-telegram-btn').addEventListener('click', async () => {
-      const telegramId = document.getElementById('user-telegram-id').value.trim();
-      if (!telegramId) return showAlert('กรุณากรอก Telegram ID', true);
-
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'update_telegram', userId: currentUser.userId, telegramId })
-        });
-        const result = await response.json();
-        if (result.status === 'success') {
-          currentUser.telegramId = telegramId;
-          localStorage.setItem('ot_user', JSON.stringify(currentUser));
-          showAlert('บันทึก Telegram ID เรียบร้อยแล้ว!', false);
-        } else {
-          showAlert(result.message, true);
-        }
-      } catch (err) { showAlert('เกิดข้อผิดพลาดในการบันทึก', true); }
-    });
-
+    // Navigation Tabs Switch
     const tabOtBtn = document.getElementById('tab-ot-btn');
     const tabUsersBtn = document.getElementById('tab-users-btn');
+    const tabSettingsBtn = document.getElementById('tab-settings-btn');
     const tabOtContent = document.getElementById('tab-ot-content');
     const tabUsersContent = document.getElementById('tab-users-content');
+    const tabSettingsContent = document.getElementById('tab-settings-content');
+
+    function resetTabs() {
+      tabOtContent.classList.add('hidden');
+      tabUsersContent.classList.add('hidden');
+      tabSettingsContent.classList.add('hidden');
+      tabOtBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
+      tabUsersBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
+      tabSettingsBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
+    }
 
     tabOtBtn.addEventListener('click', () => {
+      resetTabs();
       tabOtContent.classList.remove('hidden');
-      tabUsersContent.classList.add('hidden');
       tabOtBtn.className = "px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition";
-      tabUsersBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
     });
 
     tabUsersBtn.addEventListener('click', () => {
+      resetTabs();
       tabUsersContent.classList.remove('hidden');
-      tabOtContent.classList.add('hidden');
       tabUsersBtn.className = "px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition";
-      tabOtBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
+    });
+
+    tabSettingsBtn.addEventListener('click', () => {
+      resetTabs();
+      tabSettingsContent.classList.remove('hidden');
+      tabSettingsBtn.className = "px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition";
     });
 
     async function loadAdminData() {
@@ -496,12 +501,78 @@
       const otRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_ot_requests' }) });
       const otData = await otRes.json();
       if (otData.status === 'success') {
-        renderOtTable(otData.data);
+        allOtRequestsList = otData.data;
+        renderOtTablePagination();
         const pending = otData.data.filter(r => r.status === 'รออนุมัติ').length;
         const approved = otData.data.filter(r => r.status === 'อนุมัติ').length;
         document.getElementById('card-pending-ot').textContent = pending;
         document.getElementById('card-approved-ot').textContent = approved;
       }
+
+      const setRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_settings' }) });
+      const setData = await setRes.json();
+      if (setData.status === 'success') {
+        document.getElementById('toggle-edit-lock').checked = setData.data.allowUserEdit;
+      }
+    }
+
+    document.getElementById('toggle-edit-lock').addEventListener('change', async (e) => {
+      await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'toggle_edit_rule', allowEdit: e.target.checked })
+      });
+      showAlert('อัปเดตสิทธิ์การแก้ไขเวลาเรียบร้อยแล้ว', false);
+    });
+
+    function renderOtTablePagination() {
+      const tbody = document.getElementById('ot-table-body');
+      tbody.innerHTML = '';
+
+      const totalPages = Math.ceil(allOtRequestsList.length / itemsPerPage) || 1;
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginatedItems = allOtRequestsList.slice(startIndex, startIndex + itemsPerPage);
+
+      paginatedItems.forEach(r => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-bold text-slate-700">${r.requestId}</td>
+            <td class="p-3">${r.userId}</td>
+            <td class="p-3 text-xs leading-relaxed">${r.timeIn}<br><span class="text-slate-400">ถึง</span> ${r.timeOut}</td>
+            <td class="p-3 font-bold text-blue-600">${r.totalHours} ชม.</td>
+            <td class="p-3">
+              <button onclick="viewImages('${r.requestId}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition">
+                📷 ดูหลักฐาน
+              </button>
+            </td>
+            <td class="p-3">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${r.status === 'อนุมัติ' ? 'bg-emerald-100 text-emerald-700' : r.status === 'ปฏิเสธ' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">${r.status}</span>
+            </td>
+            <td class="p-3 space-x-1">
+              <button onclick="updateOt('${r.requestId}', 'อนุมัติ')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg text-xs transition">อนุมัติ</button>
+              <button onclick="updateOt('${r.requestId}', 'ปฏิเสธ')" class="bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded-lg text-xs transition">ปฏิเสธ</button>
+              <button onclick="nudgeTelegram('${r.requestId}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 px-2 py-1 rounded-lg text-xs transition">🔔 สะกิด</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('page-info').textContent = `แสดงหน้า ${currentPage} จาก ${totalPages}`;
+      document.getElementById('prev-page-btn').disabled = currentPage === 1;
+      document.getElementById('next-page-btn').disabled = currentPage === totalPages;
+    }
+
+    document.getElementById('prev-page-btn').addEventListener('click', () => {
+      if (currentPage > 1) { currentPage--; renderOtTablePagination(); }
+    });
+
+    document.getElementById('next-page-btn').addEventListener('click', () => {
+      const totalPages = Math.ceil(allOtRequestsList.length / itemsPerPage);
+      if (currentPage < totalPages) { currentPage++; renderOtTablePagination(); }
+    });
+
+    async function nudgeTelegram(requestId) {
+      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'nudge_telegram', requestId }) });
+      showAlert('ส่งข้อความสะกิดเตือนผ่าน Telegram สำเร็จ!', false);
     }
 
     function renderUsersTable(users) {
@@ -539,44 +610,12 @@
     }
 
     async function updateUser(userId, status, empType, role, position) {
-      await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'update_user_status', userId, status, empType, role, position })
-      });
+      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'update_user_status', userId, status, empType, role, position }) });
       loadAdminData();
     }
 
-    window.allOtRequests = [];
-    function renderOtTable(requests) {
-      window.allOtRequests = requests;
-      const tbody = document.getElementById('ot-table-body');
-      tbody.innerHTML = '';
-      requests.forEach(r => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-3 font-bold text-slate-700">${r.requestId}</td>
-            <td class="p-3">${r.userId}</td>
-            <td class="p-3 text-xs leading-relaxed">${r.timeIn}<br><span class="text-slate-400">ถึง</span> ${r.timeOut}</td>
-            <td class="p-3 font-bold text-blue-600">${r.totalHours} ชม.</td>
-            <td class="p-3">
-              <button onclick="viewImages('${r.requestId}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition">
-                📷 ดูหลักฐาน
-              </button>
-            </td>
-            <td class="p-3">
-              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${r.status === 'อนุมัติ' ? 'bg-emerald-100 text-emerald-700' : r.status === 'ปฏิเสธ' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">${r.status}</span>
-            </td>
-            <td class="p-3 space-x-1">
-              <button onclick="updateOt('${r.requestId}', 'อนุมัติ')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium shadow-sm transition">อนุมัติ</button>
-              <button onclick="updateOt('${r.requestId}', 'ปฏิเสธ')" class="bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1.5 rounded-lg text-xs font-medium transition">ปฏิเสธ</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
     function viewImages(requestId) {
-      const ot = window.allOtRequests.find(item => item.requestId === requestId);
+      const ot = allOtRequestsList.find(item => item.requestId === requestId);
       if (ot) {
         document.getElementById('modal-img-before').src = ot.imageBefore || 'https://via.placeholder.com/300x200?text=No+Image';
         document.getElementById('modal-img-after').src = ot.imageAfter || 'https://via.placeholder.com/300x200?text=No+Image';
@@ -593,13 +632,12 @@
     });
 
     async function updateOt(requestId, status) {
-      await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'update_ot_status', requestId, status })
-      });
+      const adminNote = prompt("กรอกหมายเหตุแอดมิน (ถ้ามี):");
+      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'update_ot_status', requestId, status, adminNote }) });
       loadAdminData();
     }
 
+    // OT Step Form Logic
     const step1 = document.getElementById('ot-step-1');
     const step2 = document.getElementById('ot-step-2');
     const step3 = document.getElementById('ot-step-3');
@@ -649,6 +687,7 @@
       step2.classList.remove('hidden');
     });
 
+    // Client-side Image Compression Script
     function processImage(inputEl, previewEl, callback) {
       inputEl.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -664,7 +703,7 @@
             canvas.height = img.height * scale;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const base64Str = canvas.toDataURL('image/jpeg', 0.7);
+            const base64Str = canvas.toDataURL('image/jpeg', 0.7); // บีบอัดความคมชัดที่ 70%
             previewEl.src = base64Str;
             previewEl.classList.remove('hidden');
             callback(base64Str);
@@ -695,6 +734,8 @@
       if (result.status === 'success') {
         showAlert('ยื่นคำขอ OT สำเร็จเรียบร้อยแล้ว!', false);
         setTimeout(() => location.reload(), 1500);
+      } else {
+        showAlert(result.message, true);
       }
     });
   </script>
