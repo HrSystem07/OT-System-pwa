@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบจัดการ OT - Corporate Management System</title>
+  <title>ระบบจัดการ OT - Employee Portal</title>
   
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1e293b">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5988/5988246.png">
 
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans antialiased text-slate-800">
@@ -19,7 +20,7 @@
       <div class="flex items-center gap-3">
         <div class="bg-blue-600 p-2 rounded-lg text-white font-bold text-lg">OT</div>
         <div>
-          <h1 class="font-bold text-base sm:text-lg leading-none">ระบบจัดการ OT องค์กร</h1>
+          <h1 class="font-bold text-base sm:text-lg leading-none">ระบบขออนุมัติ OT (Employee Portal)</h1>
           <p class="text-xs text-slate-400 mt-1" id="nav-user-info">ยินดีต้อนรับ</p>
         </div>
       </div>
@@ -63,251 +64,103 @@
       </div>
     </div>
 
-    <!-- 2. Register Section -->
-    <div id="register-section" class="max-w-md mx-auto my-8 bg-white rounded-2xl shadow-xl border border-slate-100 p-8 space-y-6 hidden">
-      <div class="text-center space-y-2">
-        <h2 class="text-2xl font-bold text-slate-800">ลงทะเบียนพนักงานใหม่</h2>
-        <p class="text-sm text-slate-500">กรอกข้อมูลเพื่อส่งให้ HR อนุมัติสิทธิ์การใช้งาน</p>
-      </div>
-
-      <form id="register-form" class="space-y-4">
+    <!-- 2. Employee Dashboard Section -->
+    <div id="ot-container" class="max-w-4xl mx-auto space-y-6 hidden">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex justify-between items-center">
         <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">ชื่อ-นามสกุล</label>
-          <input type="text" id="reg-fullname" placeholder="นายสมชาย ใจดี" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <h2 class="text-lg font-bold text-slate-800">รายการยื่นขอ OT ของฉัน</h2>
+          <p class="text-xs text-slate-500">กดปุ่มด้านขวาเพื่อสร้างคำขออนุมัติ OT ใหม่</p>
         </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">สังกัดสาขา</label>
-          <select id="reg-branch" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <option value="สำนักงานใหญ่">สำนักงานใหญ่</option>
-            <option value="สาขาขอนแก่น">สาขาขอนแก่น</option>
-            <option value="สาขาเชียงใหม่">สาขาเชียงใหม่</option>
-            <option value="โรงงานอนาลิสต์">โรงงานอนาลิสต์</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">ชื่อผู้ใช้งาน (Username)</label>
-          <input type="text" id="reg-username" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">รหัสผ่าน (Password)</label>
-          <input type="password" id="reg-password" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-        </div>
-        <button type="submit" id="reg-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-emerald-500/20 transition">
-          ยืนยันการลงทะเบียน
+        <button id="open-ot-modal-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md shadow-blue-500/20 flex items-center gap-2 transition">
+          <span>+ ยื่นขอ OT</span>
         </button>
-      </form>
-
-      <div class="text-center text-sm text-slate-500 pt-4 border-t border-slate-100">
-        มีบัญชีใช้งานอยู่แล้ว? 
-        <button type="button" id="go-to-login-btn" class="text-blue-600 font-semibold hover:underline">กลับหน้าเข้าสู่ระบบ</button>
-      </div>
-    </div>
-
-    <!-- 3. Employee OT Request Section -->
-    <div id="ot-container" class="max-w-xl mx-auto space-y-6 hidden">
-      <div class="bg-white rounded-2xl shadow-md border p-6 space-y-4">
-        
-        <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b pb-4 pt-2">
-          <span id="step-indicator-1" class="text-blue-600">1. เลือกเวลา OT</span>
-          <span>&rarr;</span>
-          <span id="step-indicator-2">2. แนบรูปถ่ายหลักฐาน</span>
-          <span>&rarr;</span>
-          <span id="step-indicator-3">3. ยืนยันส่งคำขอ</span>
-        </div>
-
-        <div id="ot-step-1" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">เวลาเริ่มทำ OT</label>
-            <input type="datetime-local" id="time-in" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">เวลาสิ้นสุด OT</label>
-            <input type="datetime-local" id="time-out" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500">
-          </div>
-          <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl text-sm text-blue-900 flex justify-between items-center">
-            <span>จำนวนชั่วโมงประมาณการ:</span>
-            <span class="text-lg font-bold"><span id="calculated-hours">0</span> ชม.</span>
-          </div>
-          <button type="button" id="next-to-step-2" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">ถัดไป: แนบรูปถ่ายหลักฐาน</button>
-        </div>
-
-        <div id="ot-step-2" class="space-y-4 hidden">
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">รูปถ่ายก่อนเริ่ม OT (Before)</label>
-            <input type="file" id="img-before-input" accept="image/*" class="w-full text-sm">
-            <img id="preview-before" class="mt-2 h-40 w-full object-cover rounded-xl hidden border">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">รูปถ่ายหลังทำ OT เสร็จ (After)</label>
-            <input type="file" id="img-after-input" accept="image/*" class="w-full text-sm">
-            <img id="preview-after" class="mt-2 h-40 w-full object-cover rounded-xl hidden border">
-          </div>
-          <div class="flex gap-3">
-            <button type="button" id="back-to-step-1" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-semibold">ย้อนกลับ</button>
-            <button type="button" id="next-to-step-3" class="w-1/2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">ถัดไป: สรุปข้อมูล</button>
-          </div>
-        </div>
-
-        <div id="ot-step-3" class="space-y-4 hidden">
-          <div class="bg-slate-50 p-4 rounded-xl space-y-2 text-sm border">
-            <p class="flex justify-between"><span class="text-slate-500">ผู้ยื่นคำขอ:</span> <span id="summary-username" class="font-bold"></span></p>
-            <p class="flex justify-between"><span class="text-slate-500">เวลาเริ่ม:</span> <span id="summary-in" class="font-medium"></span></p>
-            <p class="flex justify-between"><span class="text-slate-500">เวลาสิ้นสุด:</span> <span id="summary-out" class="font-medium"></span></p>
-            <hr>
-            <p class="flex justify-between text-base"><span class="font-bold">ชั่วโมงรวม:</span> <span id="summary-hours" class="font-bold text-blue-600"></span> ชม.</p>
-          </div>
-          <div class="flex gap-3">
-            <button type="button" id="back-to-step-2" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-semibold">ย้อนกลับ</button>
-            <button type="button" id="submit-ot-btn" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-semibold transition">ยืนยันส่งคำขอ OT</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- 4. Admin Dashboard Section -->
-    <div id="admin-container" class="space-y-6 hidden">
-      
-      <!-- KPI Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 43a8 8 0 100-16 8 8 0 000 16zM17 11a5 5 0 100-10 5 5 0 000 10zM2 20a6 6 0 0112 0v1H2v-1z"></path></svg>
-          </div>
-          <div>
-            <p class="text-xs font-semibold text-slate-500">พนักงานทั้งหมด</p>
-            <p class="text-2xl font-bold text-slate-800" id="card-total-users">0</p>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div class="p-3 bg-amber-100 text-amber-600 rounded-xl">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
-          <div>
-            <p class="text-xs font-semibold text-slate-500">คำขอ OT รอการอนุมัติ</p>
-            <p class="text-2xl font-bold text-amber-600" id="card-pending-ot">0</p>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          </div>
-          <div>
-            <p class="text-xs font-semibold text-slate-500">คำขอ OT อนุมัติแล้ว</p>
-            <p class="text-2xl font-bold text-emerald-600" id="card-approved-ot">0</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Dashboard Panel -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        
-        <div class="flex border-b bg-slate-50 px-4 pt-2 gap-2">
-          <button id="tab-ot-btn" class="px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition">รายการขออนุมัติ OT</button>
-          <button id="tab-users-btn" class="px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition">จัดการสิทธิ์พนักงาน</button>
-          <button id="tab-settings-btn" class="px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition">ตั้งค่าระบบ</button>
-        </div>
-
-        <!-- Tab 1: OT Table with Pagination -->
-        <div id="tab-ot-content" class="p-6 space-y-4">
-          <div class="flex justify-between items-center">
-            <h3 class="text-base font-bold text-slate-800">รายการคำขอ OT ทั้งหมด</h3>
-            <button onclick="loadAdminData()" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">🔄 รีเฟรชข้อมูล</button>
-          </div>
-
-          <div class="overflow-x-auto rounded-xl border border-slate-200">
-            <table class="w-full text-xs sm:text-sm text-left text-slate-600">
-              <thead class="text-xs text-slate-500 uppercase bg-slate-100 border-b">
-                <tr>
-                  <th class="p-3">รหัส</th>
-                  <th class="p-3">พนักงาน</th>
-                  <th class="p-3">เวลาปฏิบัติงาน</th>
-                  <th class="p-3">ชม.รวม</th>
-                  <th class="p-3">หลักฐาน</th>
-                  <th class="p-3">สถานะ</th>
-                  <th class="p-3">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="ot-table-body" class="divide-y divide-slate-100">
-                <tr><td colspan="7" class="text-center p-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination Controls -->
-          <div class="flex justify-between items-center pt-2 text-xs text-slate-500">
-            <span id="page-info">แสดงหน้า 1 จาก 1</span>
-            <div class="flex gap-2">
-              <button id="prev-page-btn" class="px-3 py-1.5 border rounded-lg hover:bg-slate-50 disabled:opacity-50">ย้อนกลับ</button>
-              <button id="next-page-btn" class="px-3 py-1.5 border rounded-lg hover:bg-slate-50 disabled:opacity-50">ถัดไป</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab 2: Users Table -->
-        <div id="tab-users-content" class="p-6 space-y-4 hidden">
-          <div class="flex justify-between items-center">
-            <h3 class="text-base font-bold text-slate-800">อนุมัติและจัดการข้อมูลพนักงาน</h3>
-            <button onclick="loadAdminData()" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">🔄 รีเฟรชข้อมูล</button>
-          </div>
-
-          <div class="overflow-x-auto rounded-xl border border-slate-200">
-            <table class="w-full text-xs sm:text-sm text-left text-slate-600">
-              <thead class="text-xs text-slate-500 uppercase bg-slate-100 border-b">
-                <tr>
-                  <th class="p-3">ชื่อ-นามสกุล / สาขา</th>
-                  <th class="p-3">ตำแหน่ง</th>
-                  <th class="p-3">ประเภท</th>
-                  <th class="p-3">สถานะ</th>
-                  <th class="p-3">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="users-table-body" class="divide-y divide-slate-100">
-                <tr><td colspan="5" class="text-center p-6 text-slate-400">กำลังโหลดข้อมูล...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 3: Settings Panel -->
-        <div id="tab-settings-content" class="p-6 space-y-6 hidden">
-          <h3 class="text-base font-bold text-slate-800">การตั้งค่าระบบและเงื่อนไข HR</h3>
-          
-          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex justify-between items-center">
-            <div>
-              <p class="font-bold text-slate-800 text-sm">อนุญาตให้พนักงานยื่นและแก้ไขเวลา OT</p>
-              <p class="text-xs text-slate-500 mt-1">หากปิดสิทธิ์ พนักงานจะไม่สามารถสร้างคำขอใหม่หรือแก้ไขเวลาได้ (สำหรับช่วงสรุปยอดเงินเดือน)</p>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" id="toggle-edit-lock" class="sr-only peer">
-              <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-        </div>
-
       </div>
     </div>
 
   </main>
 
-  <!-- Modal ดูรูปภาพหลักฐาน -->
-  <div id="image-modal" class="fixed inset-0 bg-slate-900/80 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl p-6 max-w-xl w-full space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b pb-3">
-        <h3 class="font-bold text-slate-800 text-base">รูปภาพหลักฐานการทำ OT</h3>
-        <button id="close-modal-btn" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+  <!-- ==================== POPUP MODAL: ฟอร์มยื่นขอ OT สไตล์รูปภาพ ==================== -->
+  <div id="ot-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden transform transition-all border border-slate-100">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center px-6 pt-5 pb-2">
+        <h3 id="modal-title" class="font-bold text-slate-800 text-base flex items-center gap-2">
+          <span id="step-badge" class="bg-blue-600 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center">1</span>
+          <span id="step-title-text">ส่วนที่ 1: ข้อมูลเวลาปฏิบัติงาน</span>
+        </h3>
+        <button id="close-ot-modal-btn" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <p class="text-xs font-bold text-slate-500 mb-2 text-center">รูปก่อนทำ (Before)</p>
-          <img id="modal-img-before" class="w-full h-48 object-cover rounded-xl border bg-slate-50 shadow-inner" alt="ไม่มีรูปภาพ">
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-5">
+
+        <!-- สเต็ปที่ 1: ข้อมูลเวลาปฏิบัติงาน -->
+        <div id="ot-modal-step-1" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">วันที่ต้องการขอทำ OT *</label>
+            <input type="date" id="ot-date" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">เวลาเริ่ม OT</label>
+              <input type="time" id="ot-time-in" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">เวลาสิ้นสุด</label>
+              <input type="time" id="ot-time-out" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+          </div>
+
+          <!-- กล่องสรุปชั่วโมง/นาที -->
+          <div class="bg-blue-50/70 border border-blue-100 p-4 rounded-xl flex justify-between items-center text-sm text-blue-900">
+            <span class="font-medium">รวมเวลาปฏิบัติงานทั้งหมด:</span>
+            <span class="font-bold text-blue-600"><span id="calc-result-text">0 ชั่วโมง 0 นาที</span></span>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button type="button" id="btn-next-step-2" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md transition flex items-center gap-1">
+              ถัดไป &rarr;
+            </button>
+          </div>
         </div>
-        <div>
-          <p class="text-xs font-bold text-slate-500 mb-2 text-center">รูปหลังทำ (After)</p>
-          <img id="modal-img-after" class="w-full h-48 object-cover rounded-xl border bg-slate-50 shadow-inner" alt="ไม่มีรูปภาพ">
+
+        <!-- สเต็ปที่ 2: ข้อมูลงานและผู้อนุมัติ -->
+        <div id="ot-modal-step-2" class="space-y-4 hidden">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่องาน/โครงการ *</label>
+            <select id="ot-project" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="">-- โหลดโครงการ --</option>
+              <option value="โครงการระบบ OT PWA">โครงการระบบ OT PWA</option>
+              <option value="งานดูแลระบบเซิร์ฟเวอร์">งานดูแลระบบเซิร์ฟเวอร์</option>
+              <option value="งานบริการลูกค้าประจำสาขา">งานบริการลูกค้าประจำสาขา</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">เหตุผล/รายละเอียดการทำ OT *</label>
+            <textarea id="ot-reason" rows="3" placeholder="อธิบายเนื้องานโดยสังเขป..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">หัวหน้าผู้อนุมัติ *</label>
+            <select id="ot-approver" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="">-- เลือกหัวหน้าผู้อนุมัติ --</option>
+              <option value="hr.faii">คุณฐิติพรรณ สำเภารอด (HR Manager)</option>
+            </select>
+          </div>
+
+          <div class="flex justify-between items-center pt-2">
+            <button type="button" id="btn-back-step-1" class="border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold px-5 py-2.5 rounded-xl transition">
+              &larr; ย้อนกลับ
+            </button>
+            <button type="button" id="btn-submit-ot" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md transition flex items-center gap-1">
+              ตรวจสอบข้อมูล &rarr;
+            </button>
+          </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -320,19 +173,10 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbwSjoKLEOCgYTRuy0nko7WlUwil6suag_7xa6bdtCGjjTbITqWqvQAPB5tdP2fs1JsXig/exec";
 
     let currentUser = null;
-    let base64Before = "";
-    let base64After = "";
-
-    // Pagination Variables
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    let allOtRequestsList = [];
 
     const mainHeader = document.getElementById('main-header');
     const loginSection = document.getElementById('login-section');
-    const registerSection = document.getElementById('register-section');
     const otContainer = document.getElementById('ot-container');
-    const adminContainer = document.getElementById('admin-container');
     const alertBox = document.getElementById('alert-box');
 
     window.onload = () => {
@@ -345,32 +189,10 @@
 
     function routeUser() {
       mainHeader.classList.remove('hidden');
-      document.getElementById('nav-user-info').textContent = `ผู้ใช้งาน: ${currentUser.fullname || currentUser.username} (${currentUser.role})`;
-      
+      document.getElementById('nav-user-info').textContent = `ผู้ใช้งาน: ${currentUser.fullname || currentUser.username}`;
       loginSection.classList.add('hidden');
-      registerSection.classList.add('hidden');
-
-      if (currentUser.role === 'Admin') {
-        adminContainer.classList.remove('hidden');
-        otContainer.classList.add('hidden');
-        loadAdminData();
-      } else {
-        otContainer.classList.remove('hidden');
-        adminContainer.classList.add('hidden');
-      }
+      otContainer.classList.remove('hidden');
     }
-
-    document.getElementById('go-to-reg-btn').addEventListener('click', () => {
-      loginSection.classList.add('hidden');
-      registerSection.classList.remove('hidden');
-      hideAlert();
-    });
-
-    document.getElementById('go-to-login-btn').addEventListener('click', () => {
-      registerSection.classList.add('hidden');
-      loginSection.classList.remove('hidden');
-      hideAlert();
-    });
 
     function showAlert(message, isError = false) {
       alertBox.textContent = message;
@@ -382,6 +204,7 @@
 
     function hideAlert() { alertBox.classList.add('hidden'); }
 
+    // Login Form Submit
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       hideAlert();
@@ -415,39 +238,6 @@
       }
     });
 
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hideAlert();
-      const btn = document.getElementById('reg-btn');
-      btn.disabled = true;
-      btn.textContent = 'กำลังลงทะเบียน...';
-
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            action: 'register',
-            username: document.getElementById('reg-username').value.trim(),
-            password: document.getElementById('reg-password').value.trim(),
-            fullname: document.getElementById('reg-fullname').value.trim(),
-            branch: document.getElementById('reg-branch').value
-          })
-        });
-        const result = await response.json();
-        if (result.status === 'success') {
-          showAlert(result.message, false);
-          document.getElementById('register-form').reset();
-        } else {
-          showAlert(result.message, true);
-        }
-      } catch (err) { 
-        showAlert('เกิดข้อผิดพลาดในการลงทะเบียน', true); 
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'ยืนยันการลงทะเบียน';
-      }
-    });
-
     document.querySelectorAll('.logout-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         localStorage.removeItem('ot_user');
@@ -455,287 +245,111 @@
       });
     });
 
-    // Navigation Tabs Switch
-    const tabOtBtn = document.getElementById('tab-ot-btn');
-    const tabUsersBtn = document.getElementById('tab-users-btn');
-    const tabSettingsBtn = document.getElementById('tab-settings-btn');
-    const tabOtContent = document.getElementById('tab-ot-content');
-    const tabUsersContent = document.getElementById('tab-users-content');
-    const tabSettingsContent = document.getElementById('tab-settings-content');
+    // ================= POPUP MODAL LOGIC =================
+    const otModal = document.getElementById('ot-modal');
+    const openOtModalBtn = document.getElementById('open-ot-modal-btn');
+    const closeOtModalBtn = document.getElementById('close-ot-modal-btn');
+    const step1 = document.getElementById('ot-modal-step-1');
+    const step2 = document.getElementById('ot-modal-step-2');
+    const stepBadge = document.getElementById('step-badge');
+    const stepTitleText = document.getElementById('step-title-text');
 
-    function resetTabs() {
-      tabOtContent.classList.add('hidden');
-      tabUsersContent.classList.add('hidden');
-      tabSettingsContent.classList.add('hidden');
-      tabOtBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
-      tabUsersBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
-      tabSettingsBtn.className = "px-5 py-3 font-bold text-sm text-slate-500 hover:text-slate-800 transition";
-    }
-
-    tabOtBtn.addEventListener('click', () => {
-      resetTabs();
-      tabOtContent.classList.remove('hidden');
-      tabOtBtn.className = "px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition";
+    openOtModalBtn.addEventListener('click', () => {
+      otModal.classList.remove('hidden');
+      otModal.classList.add('flex');
     });
 
-    tabUsersBtn.addEventListener('click', () => {
-      resetTabs();
-      tabUsersContent.classList.remove('hidden');
-      tabUsersBtn.className = "px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition";
+    closeOtModalBtn.addEventListener('click', () => {
+      otModal.classList.add('hidden');
+      otModal.classList.remove('flex');
     });
 
-    tabSettingsBtn.addEventListener('click', () => {
-      resetTabs();
-      tabSettingsContent.classList.remove('hidden');
-      tabSettingsBtn.className = "px-5 py-3 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition";
-    });
+    // คำนวณชั่วโมงและนาทีอัตโนมัติ
+    const otTimeIn = document.getElementById('ot-time-in');
+    const otTimeOut = document.getElementById('ot-time-out');
+    const calcResultText = document.getElementById('calc-result-text');
 
-    async function loadAdminData() {
-      const uRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_users' }) });
-      const uData = await uRes.json();
-      if (uData.status === 'success') {
-        renderUsersTable(uData.data);
-        document.getElementById('card-total-users').textContent = uData.data.length;
-      }
+    function calculateTimeDifference() {
+      if (otTimeIn.value && otTimeOut.value) {
+        const [hIn, mIn] = otTimeIn.value.split(':').map(Number);
+        const [hOut, mOut] = otTimeOut.value.split(':').map(Number);
 
-      const otRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_ot_requests' }) });
-      const otData = await otRes.json();
-      if (otData.status === 'success') {
-        allOtRequestsList = otData.data;
-        renderOtTablePagination();
-        const pending = otData.data.filter(r => r.status === 'รออนุมัติ').length;
-        const approved = otData.data.filter(r => r.status === 'อนุมัติ').length;
-        document.getElementById('card-pending-ot').textContent = pending;
-        document.getElementById('card-approved-ot').textContent = approved;
-      }
+        let startMinutes = hIn * 60 + mIn;
+        let endMinutes = hOut * 60 + mOut;
 
-      const setRes = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_settings' }) });
-      const setData = await setRes.json();
-      if (setData.status === 'success') {
-        document.getElementById('toggle-edit-lock').checked = setData.data.allowUserEdit;
-      }
-    }
-
-    document.getElementById('toggle-edit-lock').addEventListener('change', async (e) => {
-      await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'toggle_edit_rule', allowEdit: e.target.checked })
-      });
-      showAlert('อัปเดตสิทธิ์การแก้ไขเวลาเรียบร้อยแล้ว', false);
-    });
-
-    function renderOtTablePagination() {
-      const tbody = document.getElementById('ot-table-body');
-      tbody.innerHTML = '';
-
-      const totalPages = Math.ceil(allOtRequestsList.length / itemsPerPage) || 1;
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const paginatedItems = allOtRequestsList.slice(startIndex, startIndex + itemsPerPage);
-
-      paginatedItems.forEach(r => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-3 font-bold text-slate-700">${r.requestId}</td>
-            <td class="p-3">${r.userId}</td>
-            <td class="p-3 text-xs leading-relaxed">${r.timeIn}<br><span class="text-slate-400">ถึง</span> ${r.timeOut}</td>
-            <td class="p-3 font-bold text-blue-600">${r.totalHours} ชม.</td>
-            <td class="p-3">
-              <button onclick="viewImages('${r.requestId}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition">
-                📷 ดูหลักฐาน
-              </button>
-            </td>
-            <td class="p-3">
-              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${r.status === 'อนุมัติ' ? 'bg-emerald-100 text-emerald-700' : r.status === 'ปฏิเสธ' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">${r.status}</span>
-            </td>
-            <td class="p-3 space-x-1">
-              <button onclick="updateOt('${r.requestId}', 'อนุมัติ')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg text-xs transition">อนุมัติ</button>
-              <button onclick="updateOt('${r.requestId}', 'ปฏิเสธ')" class="bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded-lg text-xs transition">ปฏิเสธ</button>
-              <button onclick="nudgeTelegram('${r.requestId}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 px-2 py-1 rounded-lg text-xs transition">🔔 สะกิด</button>
-            </td>
-          </tr>
-        `;
-      });
-
-      document.getElementById('page-info').textContent = `แสดงหน้า ${currentPage} จาก ${totalPages}`;
-      document.getElementById('prev-page-btn').disabled = currentPage === 1;
-      document.getElementById('next-page-btn').disabled = currentPage === totalPages;
-    }
-
-    document.getElementById('prev-page-btn').addEventListener('click', () => {
-      if (currentPage > 1) { currentPage--; renderOtTablePagination(); }
-    });
-
-    document.getElementById('next-page-btn').addEventListener('click', () => {
-      const totalPages = Math.ceil(allOtRequestsList.length / itemsPerPage);
-      if (currentPage < totalPages) { currentPage++; renderOtTablePagination(); }
-    });
-
-    async function nudgeTelegram(requestId) {
-      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'nudge_telegram', requestId }) });
-      showAlert('ส่งข้อความสะกิดเตือนผ่าน Telegram สำเร็จ!', false);
-    }
-
-    function renderUsersTable(users) {
-      const tbody = document.getElementById('users-table-body');
-      tbody.innerHTML = '';
-      users.forEach(u => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-3">
-              <span class="font-bold text-slate-800">${u.fullname || u.username}</span><br>
-              <span class="text-slate-400 text-xs">${u.branch || 'ไม่ระบุ'} (${u.userId})</span>
-            </td>
-            <td class="p-3">
-              <input type="text" value="${u.position || 'รอระบุ'}" onchange="updateUser('${u.userId}', null, null, null, this.value)" class="border rounded-lg p-1.5 text-xs w-28 bg-slate-50 focus:bg-white">
-            </td>
-            <td class="p-3">
-              <select onchange="updateUser('${u.userId}', null, this.value, null, null)" class="border rounded-lg p-1.5 text-xs bg-slate-50">
-                <option value="รายเดือน" ${u.empType === 'รายเดือน' ? 'selected' : ''}>รายเดือน</option>
-                <option value="รายวัน" ${u.empType === 'รายวัน' ? 'selected' : ''}>รายวัน</option>
-                <option value="รอระบุ" ${u.empType === 'รอระบุ' ? 'selected' : ''}>รอระบุ</option>
-              </select>
-            </td>
-            <td class="p-3">
-              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${u.status === 'ใช้งานได้' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${u.status}</span>
-            </td>
-            <td class="p-3">
-              ${u.status === 'รออนุมัติ' ? 
-                `<button onclick="updateUser('${u.userId}', 'ใช้งานได้', null, null, null)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm transition">อนุมัติสิทธิ์</button>` : 
-                `<button onclick="updateUser('${u.userId}', 'ระงับ', null, null, null)" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium transition">ระงับใช้งาน</button>`
-              }
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    async function updateUser(userId, status, empType, role, position) {
-      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'update_user_status', userId, status, empType, role, position }) });
-      loadAdminData();
-    }
-
-    function viewImages(requestId) {
-      const ot = allOtRequestsList.find(item => item.requestId === requestId);
-      if (ot) {
-        document.getElementById('modal-img-before').src = ot.imageBefore || 'https://via.placeholder.com/300x200?text=No+Image';
-        document.getElementById('modal-img-after').src = ot.imageAfter || 'https://via.placeholder.com/300x200?text=No+Image';
-        const modal = document.getElementById('image-modal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      }
-    }
-
-    document.getElementById('close-modal-btn').addEventListener('click', () => {
-      const modal = document.getElementById('image-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    });
-
-    async function updateOt(requestId, status) {
-      const adminNote = prompt("กรอกหมายเหตุแอดมิน (ถ้ามี):");
-      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'update_ot_status', requestId, status, adminNote }) });
-      loadAdminData();
-    }
-
-    // OT Step Form Logic
-    const step1 = document.getElementById('ot-step-1');
-    const step2 = document.getElementById('ot-step-2');
-    const step3 = document.getElementById('ot-step-3');
-    const timeIn = document.getElementById('time-in');
-    const timeOut = document.getElementById('time-out');
-    const calcHours = document.getElementById('calculated-hours');
-
-    function calculateOtHours() {
-      if (timeIn.value && timeOut.value) {
-        const diffMs = new Date(timeOut.value) - new Date(timeIn.value);
-        if (diffMs > 0) {
-          const hours = (diffMs / (1000 * 60 * 60)).toFixed(2);
-          calcHours.textContent = hours;
-          return hours;
+        if (endMinutes < startMinutes) {
+          endMinutes += 24 * 60; // กรณีข้ามคืน
         }
+
+        const diffMinutes = endMinutes - startMinutes;
+        const hours = Math.floor(diffMinutes / 60);
+        const minutes = diffMinutes % 60;
+
+        calcResultText.textContent = `${hours} ชั่วโมง ${minutes} นาที`;
+        return diffMinutes;
       }
-      calcHours.textContent = "0";
+      calcResultText.textContent = `0 ชั่วโมง 0 นาที`;
       return 0;
     }
 
-    timeIn.addEventListener('change', calculateOtHours);
-    timeOut.addEventListener('change', calculateOtHours);
+    otTimeIn.addEventListener('change', calculateTimeDifference);
+    otTimeOut.addEventListener('change', calculateTimeDifference);
 
-    document.getElementById('next-to-step-2').addEventListener('click', () => {
-      if (calculateOtHours() <= 0) return showAlert('กรุณาเลือกเวลาเริ่มและสิ้นสุดให้ถูกต้อง', true);
-      hideAlert();
+    // Switch Steps
+    document.getElementById('btn-next-step-2').addEventListener('click', () => {
+      if (!document.getElementById('ot-date').value) {
+        alert('กรุณาเลือกวันที่ต้องการขอทำ OT');
+        return;
+      }
+      if (calculateTimeDifference() <= 0) {
+        alert('กรุณาเลือกเวลาเริ่มและเวลาสิ้นสุดให้ถูกต้อง');
+        return;
+      }
       step1.classList.add('hidden');
       step2.classList.remove('hidden');
+      stepBadge.textContent = '2';
+      stepTitleText.textContent = 'ส่วนที่ 2: ข้อมูลงานและผู้อนุมัติ';
     });
 
-    document.getElementById('back-to-step-1').addEventListener('click', () => {
+    document.getElementById('btn-back-step-1').addEventListener('click', () => {
       step2.classList.add('hidden');
       step1.classList.remove('hidden');
+      stepBadge.textContent = '1';
+      stepTitleText.textContent = 'ส่วนที่ 1: ข้อมูลเวลาปฏิบัติงาน';
     });
 
-    document.getElementById('next-to-step-3').addEventListener('click', () => {
-      document.getElementById('summary-username').textContent = currentUser.fullname || currentUser.username;
-      document.getElementById('summary-in').textContent = timeIn.value.replace('T', ' ');
-      document.getElementById('summary-out').textContent = timeOut.value.replace('T', ' ');
-      document.getElementById('summary-hours').textContent = calcHours.textContent;
-      step2.classList.add('hidden');
-      step3.classList.remove('hidden');
-    });
+    // Submit Action
+    document.getElementById('btn-submit-ot').addEventListener('click', async () => {
+      const project = document.getElementById('ot-project').value;
+      const reason = document.getElementById('ot-reason').value.trim();
+      const approver = document.getElementById('ot-approver').value;
 
-    document.getElementById('back-to-step-2').addEventListener('click', () => {
-      step3.classList.add('hidden');
-      step2.classList.remove('hidden');
-    });
+      if (!project || !reason || !approver) {
+        alert('กรุณากรอกข้อมูลงาน เหตุผล และเลือกผู้อนุมัติให้ครบถ้วน');
+        return;
+      }
 
-    // Client-side Image Compression Script
-    function processImage(inputEl, previewEl, callback) {
-      inputEl.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let scale = 800 / img.width;
-            if (scale > 1) scale = 1;
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const base64Str = canvas.toDataURL('image/jpeg', 0.7); // บีบอัดความคมชัดที่ 70%
-            previewEl.src = base64Str;
-            previewEl.classList.remove('hidden');
-            callback(base64Str);
-          };
-          img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    processImage(document.getElementById('img-before-input'), document.getElementById('preview-before'), (b) => { base64Before = b; });
-    processImage(document.getElementById('img-after-input'), document.getElementById('preview-after'), (b) => { base64After = b; });
-
-    document.getElementById('submit-ot-btn').addEventListener('click', async () => {
       const response = await fetch(API_URL, {
         method: 'POST',
         body: JSON.stringify({
           action: 'request_ot',
           userId: currentUser.userId,
-          timeIn: timeIn.value.replace('T', ' '),
-          timeOut: timeOut.value.replace('T', ' '),
-          totalHours: calcHours.textContent,
-          imageBefore: base64Before,
-          imageAfter: base64After
+          timeIn: `${document.getElementById('ot-date').value} ${otTimeIn.value}`,
+          timeOut: `${document.getElementById('ot-date').value} ${otTimeOut.value}`,
+          totalHours: calcResultText.textContent,
+          project: project,
+          reason: reason,
+          approver: approver
         })
       });
+
       const result = await response.json();
       if (result.status === 'success') {
-        showAlert('ยื่นคำขอ OT สำเร็จเรียบร้อยแล้ว!', false);
-        setTimeout(() => location.reload(), 1500);
+        alert('ยื่นคำขอ OT เรียบร้อยแล้ว!');
+        otModal.classList.add('hidden');
+        location.reload();
       } else {
-        showAlert(result.message, true);
+        alert(result.message);
       }
     });
   </script>
